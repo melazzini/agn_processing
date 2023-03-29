@@ -240,7 +240,7 @@ class PoissonSpectrumCountFactory:
         return SpectrumCount(x, y, y_error)
 
     @staticmethod
-    def build_log_empty_spectrumcount(hv_left: float, hv_right: float, n_intervals: int):
+    def build_log_empty_spectrum_count(hv_left: float, hv_right: float, n_intervals: int)->SpectrumCount:
 
         d_nh_expo = (np.log10(hv_right)-np.log10(hv_left))/n_intervals
         hv_list = []
@@ -255,4 +255,4 @@ class PoissonSpectrumCountFactory:
         y = np.zeros(len(x))
         y_err = np.zeros(len(x))
 
-        return SpectrumBase(x, y, y_err)
+        return SpectrumCount(x, y, y_err)
