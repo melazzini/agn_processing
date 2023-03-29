@@ -3,15 +3,6 @@ import numpy as np
 
 print('hello world')
 
-photonRawInfo = PhotonRawInfo(
-    hv=6404.7,
-    theta=0.1,
-    phi=0.1,
-    photonType=PhotonType('1'),
-    line=FluorescentLine('13'),
-    numOfScatterings=1,
-    totalPathLength=1e12,
-    numOfClouds=3,
-    escapePosition=np.array([1,2,3]),
-    effectiveLength=1e8
-    )
+photonRawInfo = PhotonRawInfo.build_photon_raw_info(raw_info='6404.7 0.1 0.1 3 13 1 1e13 2 1e12 1e12 1e12 1e9')
+
+print(photonRawInfo)

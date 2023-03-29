@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass
 import numpy as np
 from typing import Final, Dict
@@ -117,3 +118,19 @@ class PhotonRawInfo:
             float: The column density of the photon's escape line
         """
         return hydrogen_concentration*self.effectiveLength
+
+    @staticmethod
+    def build_photon_raw_info(raw_info:str)-> PhotonRawInfo:
+        hv_str, theta_str, phi_str, photon_type_str, line_str, numOfScatterings_str, totalPathLength_str, numOfClouds_str, x_str,y_str,z_str,effectiveLength_str = raw_info.split()
+        return PhotonRawInfo(
+            hv=float(hv_str),
+            theta=float(theta_str),
+            phi=float(phi_str),
+            photonType=PhotonType(type_label=photon_type_str),
+            line=FluorescentLine(line_label=line_str),
+            numOfScatterings=int(numOfScatterings_str),
+            totalPathLength=float(totalPathLength_str),
+            numOfClouds=int(numOfClouds_str),
+            escapePosition=np.array([float(x_str),float(y_str),float(z_str)]),
+            effectiveLength=float(effectiveLength_str)
+        )
