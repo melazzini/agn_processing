@@ -39,7 +39,9 @@ class PhotonType:
             self.type_label = type_label
         else:
             raise ValueError(f"The photon type {type_label} is inappropriate!")
-
+    
+    def __str__(self) -> str:
+        return PHOTON_TYPES_LABELS[self.type_label]
 
 class FluorescentLine:
 
@@ -50,6 +52,8 @@ class FluorescentLine:
         else:
             raise ValueError(f"The photon line {line_label} is inappropriate!")
 
+    def __str__(self) -> str:
+        return FLUORESCENT_LINES_LABELS[self.line_label]
 
 @dataclass
 class PhotonRawInfo:
@@ -61,13 +65,13 @@ class PhotonRawInfo:
     hv=6404.7,
     theta=0.1,
     phi=0.2,
-    photonType=PhotonType('1'),
+    photon_type=PhotonType('1'),
     line=FluorescentLine('13'),
-    numOfScatterings=1,
-    totalPathLength=1e12,
-    numOfClouds=3,
-    escapePosition=np.array([1e10, 1e10, 1e10]),
-    effectiveLength=1e8,
+    n_scatterings=1,
+    total_path=1e12,
+    n_clouds=3,
+    escape_pos=np.array([1e10, 1e10, 1e10]),
+    effective_length=1e8,
     )
     """
 
@@ -83,32 +87,32 @@ class PhotonRawInfo:
     """angle between the oz -> r
     """
 
-    photonType: PhotonType
+    photon_type: PhotonType
 
     line: FluorescentLine
 
-    numOfScatterings: int
+    n_scatterings: int
     """number of compton scatterings
     """
-    totalPathLength: float
+    total_path: float
     """total path length that the photon
     traveled inside the torus before it was registered
     """
 
-    numOfClouds: int
+    n_clouds: int
     """number of clouds on the photon's escape line
     """
 
-    escapePosition: np.ndarray
+    escape_pos: np.ndarray
     """position where the photon was registered
     """
 
-    effectiveLength: float
+    effective_length: float
     """the length inside the clouds intersected
     by the photon's escape line
     """
 
-    def n_h_escape_line(self, hydrogen_concentration: float) -> float:
+    def effective_column_density(self, hydrogen_concentration: float) -> float:
         """Get the Column Density on the photons escape line
 
         Args:
@@ -117,20 +121,34 @@ class PhotonRawInfo:
         Returns:
             float: The column density of the photon's escape line
         """
-        return hydrogen_concentration*self.effectiveLength
+        return hydrogen_concentration*self.effective_length
 
     @staticmethod
     def build_photon_raw_info(raw_info:str)-> PhotonRawInfo:
-        hv_str, theta_str, phi_str, photon_type_str, line_str, numOfScatterings_str, totalPathLength_str, numOfClouds_str, x_str,y_str,z_str,effectiveLength_str = raw_info.split()
+        hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, n_clouds_str, x_str,y_str,z_str,effective_length_str = raw_info.split()
         return PhotonRawInfo(
             hv=float(hv_str),
             theta=float(theta_str),
             phi=float(phi_str),
-            photonType=PhotonType(type_label=photon_type_str),
+            photon_type=PhotonType(type_label=photon_type_str),
             line=FluorescentLine(line_label=line_str),
-            numOfScatterings=int(numOfScatterings_str),
-            totalPathLength=float(totalPathLength_str),
-            numOfClouds=int(numOfClouds_str),
-            escapePosition=np.array([float(x_str),float(y_str),float(z_str)]),
-            effectiveLength=float(effectiveLength_str)
+            n_scatterings=int(n_scatterings_str),
+            total_path=float(total_path_str),
+            n_clouds=int(n_clouds_str),
+            escape_pos=np.array([float(x_str),float(y_str),float(z_str)]),
+            effective_length=float(effective_length_str)
         )
+    
+    def __str__(self) -> str:
+        return f'hv                 : {self.hv:>15}\n'\
+               f"theta              : {self.theta:>15}\n"\
+               f"phi                : {self.phi:>15}\n"\
+               f"type               : {str(self.photon_type):>15}\n"\
+               f"line               : {str(self.line):>15}\n"\
+               f"n_scatterings      : {self.n_scatterings:>15}\n"\
+               f"total_path         : {self.total_path:>15}\n"\
+               f"n_clouds           : {self.n_clouds:>15}\n"\
+               f"escape x           : {self.escape_pos[0]:>15}\n"\
+               f"escape y           : {self.escape_pos[1]:>15}\n"\
+               f"escape z           : {self.escape_pos[2]:>15}\n"\
+               f"effective_length   : {self.effective_length:>15}\n"
