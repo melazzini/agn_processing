@@ -182,3 +182,57 @@ class SpectrumBase:
 
     def x_interval(self):
         return self.x[0], self.x[-1]
+
+
+
+class SpectrumCount(SpectrumBase):
+    """This class represents a the distribution-count
+    of particles on the given x-coordinates. The x-coordinates
+    can be for example energy bins. The y coordinate represents
+    the number of particles on the given x.
+    """
+
+    def __init__(self, x: Iterable[float],
+                 y: Iterable[float],
+                 y_err: Iterable[float]):
+        """Creates an instance of the spectrum counts
+
+        Args:
+            x (Iterable[float]): spectrum x coordinates
+            y (Iterable[float]): spectrum values
+            y_err (Iterable[float]): errors on the spectrum values
+        """
+        super().__init__(x, y, y_err)
+
+
+class PoissonSpectrumCountFactory:
+    """This is a helper class to construct
+    particle-distribution spectra with 
+    Poisson distribution.
+
+    Notice, that in this case the errors
+    will be the square root of the number of
+    particles.
+    """
+    
+    @staticmethod
+    def build_spectrum_count(*files: Iterable[str]) -> SpectrumCount:
+        """This factory method returns the particle distribution
+        corresponding to the given files.
+
+        Args:
+            files (Tupe[str]): paths to spectrum files
+        Returns:
+            SpectrumCount: The resulting Poisson spectrum count.
+        """
+        x, y = x_y(files[0])
+
+        for i in range(1, len(files)):
+            _, y_ = x_y(files[i])
+            y = y+y_
+
+        y_error = np.sqrt(y)
+
+        return SpectrumCount(x, y, y_error)
+    
+

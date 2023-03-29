@@ -176,8 +176,8 @@ class Interval2D:
     left: float
     right: float
 
-    def __contains__(self, other: Interval2D) -> bool:
-        if self.left <= other.left <= other.right <= self.right:
+    def __contains__(self, value: float) -> bool:
+        if self.left <=value <= self.right:
             return True
         else:
             return False

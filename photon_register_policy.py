@@ -1,3 +1,18 @@
+"""
+==========================
+example 01:
+
+from photon_register_policy import PhotonRawInfo
+
+photonRawInfo = PhotonRawInfo.build_photon_raw_info(raw_info='6404.7 0.1 0.1 3 13 1 1e13 2 1e12 1e12 1e12 1e9')
+
+print(photonRawInfo)
+
+===========================
+
+"""
+
+
 from __future__ import annotations
 from dataclasses import dataclass
 import numpy as np
@@ -29,7 +44,6 @@ FLUORESCENT_LINES_LABELS: Final[Dict[str, float]] = {
     '14': 'NiKalpha',
     '15': 'UNKNOWN ',
 }
-
 
 class PhotonType:
 
