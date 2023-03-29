@@ -33,7 +33,7 @@ class SpectrumBase:
         y: the spectrum values, for example flux-density
 
         y_err: the error on y values, for example the standard deviation
-        
+
         Both x,y,y_err are grouped into @SpectrumBaseItem objects
 
     The user has to determine the meaning and units of x and y.
@@ -43,7 +43,7 @@ class SpectrumBase:
 
     def __init__(self, x: Iterable[float],
                  y: Iterable[float],
-                 y_err: Iterable[float]):
+                 y_err: Iterable[float], interval: Interval2D = None):
         """Creates an instance of the class.
 
         Args:
@@ -54,6 +54,12 @@ class SpectrumBase:
         if len(x) == len(y) == len(y_err):
             self.length = len(x)
             self.pos = 0
+            self.interval = None
+
+            if interval:
+                self.interval = interval
+            else:
+                self.interval = Interval2D(x[0], x[-1])
 
             self.spectrum_list = np.empty(len(x), dtype=SpectrumBaseItem)
             for i in range(len(x)):
@@ -75,11 +81,11 @@ class SpectrumBase:
         return self
 
     def __getitem__(self, index: int) -> SpectrumBaseItem:
-        
+
         return self.spectrum_list[index]
 
     def __len__(self) -> int:
-        return len(self.x)
+        return len(self.spectrum_list)
 
     # def components(self) -> Tuple[Iterable[float], Iterable[float], Iterable[float]]:
     #     """Returns a tuple with the copy of
@@ -198,7 +204,7 @@ class SpectrumCount(SpectrumBase):
 
     def __init__(self, x: Iterable[float],
                  y: Iterable[float],
-                 y_err: Iterable[float]):
+                 y_err: Iterable[float], interval: Interval2D = None):
         """Creates an instance of the spectrum counts
 
         Args:
@@ -206,7 +212,7 @@ class SpectrumCount(SpectrumBase):
             y (Iterable[float]): spectrum values
             y_err (Iterable[float]): errors on the spectrum values
         """
-        super().__init__(x, y, y_err)
+        super().__init__(x, y, y_err, interval)
 
 
 class PoissonSpectrumCountFactory:
@@ -240,7 +246,7 @@ class PoissonSpectrumCountFactory:
         return SpectrumCount(x, y, y_error)
 
     @staticmethod
-    def build_log_empty_spectrum_count(hv_left: float, hv_right: float, n_intervals: int)->SpectrumCount:
+    def build_log_empty_spectrum_count(hv_left: float, hv_right: float, n_intervals: int) -> SpectrumCount:
 
         d_nh_expo = (np.log10(hv_right)-np.log10(hv_left))/n_intervals
         hv_list = []
@@ -255,4 +261,10 @@ class PoissonSpectrumCountFactory:
         y = np.zeros(len(x))
         y_err = np.zeros(len(x))
 
-        return SpectrumCount(x, y, y_err)
+        return SpectrumCount(x, y, y_err, EnergyInterval(hv_left, hv_right))
+
+
+def count_photon_into_log_spectrum(spectrum: SpectrumCount, hv: float):
+    index = get_interval_index_log(hv, spectrum.interval, len(spectrum))
+    spectrum[index].y += 1
+    spectrum[index].y_err = spectrum[index].y**0.5
