@@ -139,7 +139,7 @@ class _AgnInfoRaw:
 class AgnSimulationPolicy:
     """This class handles the details of getting the agn simulation
     information according to the established units, format of the info
-    file, etc. It's responsibility is to translate properly the info file
+    file, etc. Its responsibility is to translate properly the info file
     and give you useful data according to the policy.
 
     Here the word policy means the way we save values, text, units, from simulation 
