@@ -1,6 +1,19 @@
 from __future__ import annotations
 from typing import Final, List, Dict, Iterable, Set
 from utils import *
+from agn_utils import AgnSimulationInfo
+from colum_density_utils import ColumnDensityGrid
+
+"""TODO"""
+SPECTRUM_PHOTON_TYPES_LABELS: Final[Dict[str, float]] = {
+    # THE PHOTON COMES FROM THE SOURCE AND DID NOT INTERSECT ANY CLOUD OR MATTER IN THE TORUS
+    'SOURCE': ('TRANSMITTED'),
+    # THE PHOTON INTERSECTED THE TORUS CLOUDS/MATTER BUT IT DID NOT INTERACTED
+    'NO_INTERACTION': ('TRANSMITTED'),
+    # THE PHOTON INTERACTED WITH THE TORUS BY COMPTON SCATTING
+    'SCATTERING': ('COMPTON'),
+    'FLUORESCENT': ('FLUORESCENT'),  # THIS IS A FLUORESCENT PHOTON
+}
 
 
 @dataclass
@@ -268,3 +281,23 @@ def count_photon_into_log_spectrum(spectrum: SpectrumCount, hv: float):
     index = get_interval_index_log(hv, spectrum.interval, len(spectrum))
     spectrum[index].y += 1
     spectrum[index].y_err = spectrum[index].y**0.5
+
+
+class SpectraBuilder:
+    """This class builds the agn spectra from a given simulation.
+    It groups the spectra by column densities and by type of photons.
+    """
+
+    def __init__(self, sim_info: AgnSimulationInfo, grid: ColumnDensityGrid) -> None:
+        self.sim_info = sim_info
+        self.grid = grid
+
+    def build(output_dir: str, angular_interval: AngularInterval):
+        pass
+
+
+nh_grid = ColumnDensityGrid(left_nh=1e22, right_nh=2e24, n_intervals=30)
+
+print(nh_grid.index(nh=1e23))
+
+print(nh_grid)

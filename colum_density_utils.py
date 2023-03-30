@@ -80,13 +80,16 @@ class ColumnDensityGrid:
         else:
             None
 
+    def __str__(self):
+        return f'{self.left:0.2g}:{self.right:0.2g}:{self.n_intervals}'
+
 
 def get_hydrogen_concentration(column_density: float,
                                filling_factor: float,
                                internal_torus_radius: float,
                                external_torus_radius: float) -> float:
     """Get the concentration of Hydrogen in the matter.
-    
+
     Be consistent with your units!
 
     Args:
@@ -99,7 +102,7 @@ def get_hydrogen_concentration(column_density: float,
         float: Concentration of hydrogen.
 
     example:
-    
+
     print(get_hydrogen_concentration(column_density=1e23,
                                  filling_factor=0.03,
                                  internal_torus_radius=1e14,
