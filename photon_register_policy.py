@@ -20,7 +20,8 @@ from typing import Final, Dict
 
 PHOTON_TYPES_LABELS: Final[Dict[str, float]] = {
     '0': 'SOURCE',  # THE PHOTON COMES FROM THE SOURCE AND DID NOT INTERSECT ANY CLOUD OR MATTER IN THE TORUS
-    '1': 'NO_INTERACTIONS',# THE PHOTON INTERSECTED THE TORUS CLOUDS/MATTER BUT IT DID NOT INTERACTED
+    # THE PHOTON INTERSECTED THE TORUS CLOUDS/MATTER BUT IT DID NOT INTERACTED
+    '1': 'NO_INTERACTIONS',
     '2': 'SCATTERING',  # THE PHOTON INTERACTED WITH THE TORUS BY COMPTON SCATTING
     '3': 'FLUORESCENT',  # THIS IS A FLUORESCENT PHOTON
 }
@@ -45,6 +46,7 @@ FLUORESCENT_LINES_LABELS: Final[Dict[str, float]] = {
     '15': 'UNKNOWN ',
 }
 
+
 class PhotonType:
 
     def __init__(self, type_label: str):
@@ -53,9 +55,10 @@ class PhotonType:
             self.type_label = type_label
         else:
             raise ValueError(f"The photon type {type_label} is inappropriate!")
-    
+
     def __str__(self) -> str:
         return PHOTON_TYPES_LABELS[self.type_label]
+
 
 class FluorescentLine:
 
@@ -69,12 +72,13 @@ class FluorescentLine:
     def __str__(self) -> str:
         return FLUORESCENT_LINES_LABELS[self.line_label]
 
+
 @dataclass
 class PhotonRawInfo:
     """
     This class represents the information of a 
     registered-from-simulation photon.
-    
+
     photonRawInfo = PhotonRawInfo(
     hv=6404.7,
     theta=0.1,
@@ -138,8 +142,8 @@ class PhotonRawInfo:
         return hydrogen_concentration*self.effective_length
 
     @staticmethod
-    def build_photon_raw_info(raw_info:str)-> PhotonRawInfo:
-        hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, n_clouds_str, x_str,y_str,z_str,effective_length_str = raw_info.split()
+    def build_photon_raw_info(raw_info: str) -> PhotonRawInfo:
+        hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, n_clouds_str, x_str, y_str, z_str, effective_length_str = raw_info.split()
         return PhotonRawInfo(
             hv=float(hv_str),
             theta=float(theta_str),
@@ -149,10 +153,10 @@ class PhotonRawInfo:
             n_scatterings=int(n_scatterings_str),
             total_path=float(total_path_str),
             n_clouds=int(n_clouds_str),
-            escape_pos=np.array([float(x_str),float(y_str),float(z_str)]),
+            escape_pos=np.array([float(x_str), float(y_str), float(z_str)]),
             effective_length=float(effective_length_str)
         )
-    
+
     def __str__(self) -> str:
         return f'hv                 : {self.hv:>15}\n'\
                f"theta              : {self.theta:>15}\n"\
@@ -166,3 +170,4 @@ class PhotonRawInfo:
                f"escape y           : {self.escape_pos[1]:>15}\n"\
                f"escape z           : {self.escape_pos[2]:>15}\n"\
                f"effective_length   : {self.effective_length:>15}\n"
+
