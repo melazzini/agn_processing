@@ -96,7 +96,54 @@ def x_y_z(path: str, index_left: int = 0, index_mid: int = 1, index_right: int =
         return np.array([data[index_left]]), np.array([data[index_mid]]), np.array([data[index_right]])
 
 
-class AngularInterval:
+def mean_2d(x_ar: Vector1d, y_ar: Vector1d) -> Tuple[float, float]:
+    """Get the mean of two 1d-Vectors at the same time.
+
+    The length of both vectors must be same!
+
+    Args:
+        x_ar (Vector1d): x-Vector, for example [1,2,3]
+        y_ar (Vector1d): y-Vector, for example [0,1,2]
+
+    Raises:
+        ValueError: if the lengths of the vectors is different.
+
+    Returns:
+        Tuple[float, float]: mean of the x-vector, mean of the y-vector
+    """
+    if(len(x_ar) != len(y_ar)):
+        raise ValueError("the length of the arrays must be equal!")
+    return np.mean(x_ar), np.mean(y_ar)
+
+
+@dataclass
+class ValueAndError:
+    value: float
+    err: float
+
+
+@dataclass
+class Interval2D:
+    left: float
+    right: float
+
+    def __contains__(self, value: float) -> bool:
+        if self.left<self.right:
+            if self.left <= value <= self.right:
+                return True
+            else:
+                return False
+        else:
+            if self.left >= value >= self.right:
+                return True
+            else:
+                return False
+
+class EnergyInterval(Interval2D):
+    pass
+
+
+class AngularInterval(Interval2D):
     """Represents an angular interval.
     """
 
@@ -115,6 +162,7 @@ class AngularInterval:
         self.beg = beg
         self.length = length
         self.end = self.beg + self.length
+        super().__init__(left=self.beg, right=self.end)
 
     def from_deg_to_rad(self) -> AngularInterval:
         """Translates from degrees to radians the angular interval.
@@ -143,46 +191,4 @@ class AngularInterval:
         return self
 
     def __str__(self):
-        return f'({self.beg}, +{self.length})'
-
-
-def mean_2d(x_ar: Vector1d, y_ar: Vector1d) -> Tuple[float, float]:
-    """Get the mean of two 1d-Vectors at the same time.
-
-    The length of both vectors must be same!
-
-    Args:
-        x_ar (Vector1d): x-Vector, for example [1,2,3]
-        y_ar (Vector1d): y-Vector, for example [0,1,2]
-
-    Raises:
-        ValueError: if the lengths of the vectors is different.
-
-    Returns:
-        Tuple[float, float]: mean of the x-vector, mean of the y-vector
-    """
-    if(len(x_ar) != len(y_ar)):
-        raise ValueError("the length of the arrays must be equal!")
-    return np.mean(x_ar), np.mean(y_ar)
-
-
-@dataclass
-class ValueAndError:
-    value: float
-    err: float
-
-@dataclass
-class Interval2D:
-    left: float
-    right: float
-
-    def __contains__(self, value: float) -> bool:
-        if self.left <=value <= self.right:
-            return True
-        else:
-            return False
-
-
-class EnergyInterval(Interval2D):
-    pass
-
+        return f'({self.beg}, {self.length})'

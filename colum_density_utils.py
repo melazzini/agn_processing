@@ -1,9 +1,5 @@
 from utils import *
 
-LEFT_NH = 1E22
-RIGHT_NH = 2E24
-NH_INTERVALS = 30
-
 
 class ColumnDensityInterval(Interval2D):
     pass

@@ -3,6 +3,7 @@ from typing import Final, List, Dict, Iterable, Set
 from utils import *
 from agn_utils import AgnSimulationInfo
 from colum_density_utils import ColumnDensityGrid
+from agn_processing_policy import *
 
 """TODO"""
 SPECTRUM_PHOTON_TYPES_LABELS: Final[Dict[str, float]] = {
@@ -288,7 +289,8 @@ class SpectraBuilder:
     It groups the spectra by column densities and by type of photons.
     """
 
-    def __init__(self, sim_info: AgnSimulationInfo, grid: ColumnDensityGrid) -> None:
+    def __init__(self, sim_info: AgnSimulationInfo,
+                 grid: ColumnDensityGrid = ColumnDensityGrid(LEFT_NH, RIGHT_NH, NH_INTERVALS)) -> None:
         self.sim_info = sim_info
         self.grid = grid
 
@@ -296,8 +298,9 @@ class SpectraBuilder:
         pass
 
 
-nh_grid = ColumnDensityGrid(left_nh=1e22, right_nh=2e24, n_intervals=30)
+nh_grid = ColumnDensityGrid(
+    left_nh=LEFT_NH, right_nh=RIGHT_NH, n_intervals=NH_INTERVALS)
 
-print(nh_grid.index(nh=1e23))
+print(nh_grid.index(nh=1e24))
 
-print(nh_grid)
+print(nh_grid.nh_list)
