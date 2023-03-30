@@ -85,10 +85,24 @@ def get_hydrogen_concentration(column_density: float,
                                filling_factor: float,
                                internal_torus_radius: float,
                                external_torus_radius: float) -> float:
-    return column_density/(filling_factor*(external_torus_radius-internal_torus_radius))
+    """Get the concentration of Hydrogen in the matter.
+    
+    Be consistent with your units!
 
+    Args:
+        column_density (float): Column density
+        filling_factor (float): filling factor in the torus
+        internal_torus_radius (float): 
+        external_torus_radius (float): 
 
-print(get_hydrogen_concentration(column_density=1e23,
+    Returns:
+        float: Concentration of hydrogen.
+
+    example:
+    
+    print(get_hydrogen_concentration(column_density=1e23,
                                  filling_factor=0.03,
                                  internal_torus_radius=1e14,
                                  external_torus_radius=1e15))
+    """
+    return column_density/(filling_factor*(external_torus_radius-internal_torus_radius))
