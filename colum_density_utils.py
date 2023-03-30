@@ -79,3 +79,16 @@ class ColumnDensityGrid:
                 return i
         else:
             None
+
+
+def get_hydrogen_concentration(column_density: float,
+                               filling_factor: float,
+                               internal_torus_radius: float,
+                               external_torus_radius: float) -> float:
+    return column_density/(filling_factor*(external_torus_radius-internal_torus_radius))
+
+
+print(get_hydrogen_concentration(column_density=1e23,
+                                 filling_factor=0.03,
+                                 internal_torus_radius=1e14,
+                                 external_torus_radius=1e15))
