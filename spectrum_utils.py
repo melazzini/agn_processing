@@ -295,7 +295,12 @@ class SpectraBuilder:
         self.grid = grid
 
     def build(output_dir: str, angular_interval: AngularInterval):
+        
+        print(angular_interval)
+        
         pass
+    
+    
 
 
 nh_grid = ColumnDensityGrid(

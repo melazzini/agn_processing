@@ -1,6 +1,8 @@
 from __future__ import annotations
 from agn_simulation_policy import *
 from functools import reduce
+import numpy as np
+from utils import *
 
 
 @dataclass
@@ -138,3 +140,19 @@ class AgnSimulationInfo:
             other_parameters=policy.get_other_extra_parameters(),
             simulation_files=get_simulation_files_list(sim_root_dir)
         )
+
+
+def translate_zenit(zenith_angular_interval: AngularInterval)->AngularInterval:
+        """You pass it an angular interval seen from the oz axis
+        and it gives you the corresponding angular interval
+        but seen from the oxy plane.
+
+        Args:
+            zenith_angular_interval (AngularInterval): angular interval seen from the oz axis
+
+        Returns:
+            AngularInterval: angular interval seen from the oxy plane
+        """
+        
+        beg = np.pi/2 - zenith_angular_interval.end
+        return AngularInterval(beg=beg, length=zenith_angular_interval.length)

@@ -192,3 +192,6 @@ class AngularInterval(Interval2D):
 
     def __str__(self):
         return f'({self.beg}, {self.length})'
+    
+
+    

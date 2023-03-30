@@ -1,6 +1,6 @@
 from spectrum_utils import *
 from colum_density_utils import *
-from agn_utils import AgnSimulationInfo
+from agn_utils import AgnSimulationInfo, translate_zenit
 from math import radians
 
 empty_spectrum = PoissonSpectrumCountFactory.build_log_empty_spectrum_count(
@@ -45,8 +45,10 @@ print(agn_info)
 builder = SpectraBuilder(
     '/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/224_3_03_05xfe_c301wp_250M_lp01')
 
-builder.build(AngularInterval(beg=radians(60), length=radians(15)))
 
-a = AngularInterval(60, -15)
+builder.build(translate_zenit(
+    AngularInterval(beg=radians(75), length=radians(15))))
 
-print(44.9 in a)
+# a = AngularInterval(60, -15)
+
+# print(44.9 in a)
