@@ -71,16 +71,10 @@ class ColumnDensityGrid:
         Args:
             nh (float): the column density
         """
-        # if(nh <= 0):
-        #     return 0
+        if(nh <= 0):
+            return 0
 
-        # return int((np.log10(nh)-np.log10(self.left))/self.d_nh)
-
-        for i, bounds in enumerate(self.bounds):
-            if nh in bounds:
-                return i
-        else:
-            return -1
+        return int((np.log10(nh)-np.log10(self.left))/self.d_nh)
 
     def __str__(self):
         return f'{self.left:0.2g}:{self.right:0.2g}:{self.n_intervals}'
@@ -111,8 +105,3 @@ def get_hydrogen_concentration(aver_column_density: float,
                                  external_torus_radius=1e15))
     """
     return aver_column_density/(filling_factor*(external_torus_radius-internal_torus_radius))
-
-
-nh_grid = ColumnDensityGrid(left_nh=1e22, right_nh=5e25, n_intervals=30)
-
-print(nh_grid.index(nh=1e23))
