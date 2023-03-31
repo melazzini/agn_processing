@@ -56,6 +56,8 @@ class ColumnDensityGrid:
             np.log10(self.left), np.log10(self.right), n_intervals+1)
 
         self.__setup_grid(nh_bounds_raw)
+        self.d_nh = (np.log10(self.right) -
+                     np.log10(self.left))/self.n_intervals
 
     def __setup_grid(self, nh_bounds_raw):
         for i, nh_left_val in enumerate(nh_bounds_raw[:-1]):
@@ -69,18 +71,22 @@ class ColumnDensityGrid:
         Args:
             nh (float): the column density
         """
+        # if(nh <= 0):
+        #     return 0
+
+        # return int((np.log10(nh)-np.log10(self.left))/self.d_nh)
 
         for i, bounds in enumerate(self.bounds):
             if nh in bounds:
                 return i
         else:
-            None
+            return -1
 
     def __str__(self):
         return f'{self.left:0.2g}:{self.right:0.2g}:{self.n_intervals}'
 
 
-def get_hydrogen_concentration(column_density: float,
+def get_hydrogen_concentration(aver_column_density: float,
                                filling_factor: float,
                                internal_torus_radius: float,
                                external_torus_radius: float) -> float:
@@ -89,7 +95,7 @@ def get_hydrogen_concentration(column_density: float,
     Be consistent with your units!
 
     Args:
-        column_density (float): Column density
+        column_density (float): Average column density
         filling_factor (float): filling factor in the torus
         internal_torus_radius (float): 
         external_torus_radius (float): 
@@ -104,4 +110,9 @@ def get_hydrogen_concentration(column_density: float,
                                  internal_torus_radius=1e14,
                                  external_torus_radius=1e15))
     """
-    return column_density/(filling_factor*(external_torus_radius-internal_torus_radius))
+    return aver_column_density/(filling_factor*(external_torus_radius-internal_torus_radius))
+
+
+nh_grid = ColumnDensityGrid(left_nh=1e22, right_nh=5e25, n_intervals=30)
+
+print(nh_grid.index(nh=1e23))

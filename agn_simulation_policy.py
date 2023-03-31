@@ -6,14 +6,7 @@ from unit_convert import UnitConvert
 from math import radians
 import pint
 from os import listdir
-
-_LENGTH = 'L'
-_TIME = 'T'
-_MASS = 'M'
-_TEMPERATURE = 'K'
-_ANGLE = 'A'
-_ENERGY = 'ML2T-2'
-_N_H_DIM = '_N_H_'
+from utils import *
 
 
 _AGN_SIMULATION_DATA_DIR_PREFIX: Final[str] = 'data'
@@ -23,23 +16,23 @@ _AGN_CLOUDS_FILE_NAME: Final[str] = 'clouds.txt'
 _AGN_SIMULATION_LABEL_HINT = 'thread'
 
 _AGN_SIMULATION_UNITS: Final[Dict[str, str]] = {
-    _LENGTH: 'meters',
-    _TIME: 'seconds',
-    _MASS: 'kilograms',
-    _TEMPERATURE: 'kelvins',
-    _ENERGY: 'electronvolts',
-    _ANGLE: 'degrees',
-    _N_H_DIM: '1/m^2'
+    LENGTH: 'meters',
+    TIME: 'seconds',
+    MASS: 'kilograms',
+    TEMPERATURE: 'kelvins',
+    ENERGY: 'eV',
+    ANGLE: 'degrees',
+    N_H_DIM: '1/m^2'
 }
 
 _AGN_PROCESSING_UNITS: Final[Dict[str, str]] = {
-    _LENGTH: 'cm',
-    _TIME: 'seconds',
-    _MASS: 'grams',
-    _TEMPERATURE: 'kelvin',
-    _ENERGY: 'electronvolts',
-    _ANGLE: 'radians',
-    _N_H_DIM: '1/cm^2'
+    LENGTH: 'cm',
+    TIME: 'seconds',
+    MASS: 'grams',
+    TEMPERATURE: 'kelvin',
+    ENERGY: 'eV',
+    ANGLE: 'radians',
+    N_H_DIM: '1/cm^2'
 }
 
 
@@ -168,16 +161,16 @@ class AgnSimulationPolicy:
         self.ureg = pint.UnitRegistry()
 
     def get_internal_radius(self) -> float:
-        return self.__translate_from_sim_to_processing_units(value=self._info_raw.r1, dimensionality=_LENGTH)
+        return self.__translate_from_sim_to_processing_units(value=self._info_raw.r1, dimensionality=LENGTH)
 
     def get_external_radius(self) -> float:
-        return self.__translate_from_sim_to_processing_units(value=self._info_raw.r2, dimensionality=_LENGTH)
+        return self.__translate_from_sim_to_processing_units(value=self._info_raw.r2, dimensionality=LENGTH)
 
     def get_half_opening_angle(self) -> float:
-        return self.__translate_from_sim_to_processing_units(value=self._info_raw.theta, dimensionality=_ANGLE)
+        return self.__translate_from_sim_to_processing_units(value=self._info_raw.theta, dimensionality=ANGLE)
 
     def get_average_column_density(self) -> float:
-        return self.__translate_from_sim_to_processing_units(value=self._info_raw.nh_aver, dimensionality=_N_H_DIM)
+        return self.__translate_from_sim_to_processing_units(value=self._info_raw.nh_aver, dimensionality=N_H_DIM)
 
     def get_aver_n_clouds(self):
         return self._info_raw.n_aver
@@ -192,10 +185,10 @@ class AgnSimulationPolicy:
         return self._info_raw.n_clouds
 
     def get_r_clouds(self):
-        return self.__translate_from_sim_to_processing_units(value=self._info_raw.r_clouds, dimensionality=_LENGTH)
+        return self.__translate_from_sim_to_processing_units(value=self._info_raw.r_clouds, dimensionality=LENGTH)
 
     def get_temperature_electrons(self):
-        return self.__translate_from_sim_to_processing_units(value=self._info_raw.temperature_e, dimensionality=_TEMPERATURE)
+        return self.__translate_from_sim_to_processing_units(value=self._info_raw.temperature_e, dimensionality=TEMPERATURE)
 
     def get_other_extra_parameters(self):
         return self._info_raw.other_parameters

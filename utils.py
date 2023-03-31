@@ -2,12 +2,21 @@ from __future__ import annotations
 import numpy as np
 from dataclasses import dataclass
 from typing import Tuple, List
+from abc import abstractmethod, ABC
 
 Vector1d = List[float]
 """List of numbers or similar like a 1d-ndarray object."""
 
 DEFAULT_EPSILON = 1E-12
 """this is the default precision that we use in our calculations"""
+
+LENGTH = 'L'
+TIME = 'T'
+MASS = 'M'
+TEMPERATURE = 'K'
+ANGLE = 'A'
+ENERGY = 'ML2T-2'
+N_H_DIM = '_N_H_'
 
 
 def solid_angle(half_opening_angle: float) -> float:
@@ -128,7 +137,7 @@ class Interval2D:
     right: float
 
     def __contains__(self, value: float) -> bool:
-        if self.left<self.right:
+        if self.left < self.right:
             if self.left <= value <= self.right:
                 return True
             else:
@@ -138,6 +147,7 @@ class Interval2D:
                 return True
             else:
                 return False
+
 
 class EnergyInterval(Interval2D):
     pass
@@ -192,6 +202,18 @@ class AngularInterval(Interval2D):
 
     def __str__(self):
         return f'({self.beg}, {self.length})'
-    
 
-    
+
+class UnitsPolicy(ABC):
+
+    @abstractmethod
+    def translate_energy(self, value: float) -> float:
+        pass
+
+    @abstractmethod
+    def translate_length(self, value: float) -> float:
+        pass
+
+    @abstractmethod
+    def translate_angle(self, value: float) -> float:
+        pass

@@ -2,8 +2,11 @@ from __future__ import annotations
 from typing import Final, List, Dict, Iterable, Set
 from utils import *
 from agn_utils import AgnSimulationInfo
-from colum_density_utils import ColumnDensityGrid
+from colum_density_utils import ColumnDensityGrid, get_hydrogen_concentration
 from agn_processing_policy import *
+from photon_register_policy import PhotonInfo, PhotonType, AgnPhotonUnitsPolicy
+from io import TextIOWrapper
+import os
 
 """TODO"""
 SPECTRUM_PHOTON_TYPES_LABELS: Final[Dict[str, float]] = {
@@ -284,28 +287,143 @@ def count_photon_into_log_spectrum(spectrum: SpectrumCount, hv: float):
     spectrum[index].y_err = spectrum[index].y**0.5
 
 
+class PhotonRegistrationPolicy(ABC):
+
+    @abstractmethod
+    def get_label_for_photon(self, photon_info: PhotonInfo) -> str:
+        pass
+
+
+class NHPhotonRegistrationPolicy(PhotonRegistrationPolicy):
+
+    def __init__(self, simulation_info: AgnSimulationInfo, nh_grid=ColumnDensityGrid(LEFT_NH, RIGHT_NH, NH_INTERVALS)) -> None:
+        super().__init__()
+        self.sim_info = simulation_info
+        self.hydrogen_concentration = get_hydrogen_concentration(aver_column_density=self.sim_info.nh_aver,
+                                                                 filling_factor=self.sim_info.phi,
+                                                                 internal_torus_radius=self.sim_info.r1,
+                                                                 external_torus_radius=self.sim_info.r2)
+        self.grid = nh_grid
+
+    def get_label_for_photon(self, photon_info: PhotonInfo) -> str:
+
+        nh_grid_index = self.grid.index(
+            photon_info.effective_column_density(self.hydrogen_concentration))
+
+        return f'{nh_grid_index}_{photon_info.photon_type}_{photon_info.line}'
+
+
 class SpectraBuilder:
-    """This class builds the agn spectra from a given simulation.
-    It groups the spectra by column densities and by type of photons.
+    """This class builds the agn spectra files from a given simulation.
+    It groups the spectra by the provided policy.
     """
 
     def __init__(self, sim_info: AgnSimulationInfo,
-                 grid: ColumnDensityGrid = ColumnDensityGrid(LEFT_NH, RIGHT_NH, NH_INTERVALS)) -> None:
+                 photon_registration_policy: PhotonRegistrationPolicy,
+                 hv_interval: EnergyInterval = EnergyInterval(100, 300_000),
+                 hv_n_intervals: int = 2000,
+                 photon_units_policy: UnitsPolicy = AgnPhotonUnitsPolicy(),
+                 ) -> None:
+
         self.sim_info = sim_info
-        self.grid = grid
 
-    def build(output_dir: str, angular_interval: AngularInterval):
-        
-        print(angular_interval)
-        
-        pass
-    
-    
+        self.photon_units_policy = photon_units_policy
+        self.hv_interval = hv_interval
+        self.hv_n_intervals = hv_n_intervals
+        self.registration_policy = photon_registration_policy
+
+    def build(self,
+              angular_interval: AngularInterval,
+              log_every_n_photons: int = 1000):
+
+        spectra: Dict[str, SpectrumCount] = {}
+
+        self.__process_simulation(
+            sim_info=self.sim_info,
+            spectra=spectra,
+            angular_interval=angular_interval,
+            log_every_n_photons=log_every_n_photons)
+
+        return spectra
+
+    def __log_status(self, file_label: str, n_photons_processed: int, limit: int = 1000):
+        if not limit:
+            return
+        if n_photons_processed % limit == 0:
+            print(
+                f'Number of photons processed for {file_label}: {n_photons_processed}')
+
+    def __register_photon(self, photon_info: PhotonInfo, spectra: Dict[str, SpectrumCount]):
+
+        spectrum_label = self.registration_policy.get_label_for_photon(
+            photon_info=photon_info)
+
+        if spectrum_label not in spectra:
+            self.__generate_spectrum(spectra, spectrum_label)
+
+        count_photon_into_log_spectrum(
+            spectrum=spectra[spectrum_label],
+            hv=photon_info.hv)
+
+    def __process_file(self,
+                       file: TextIOWrapper, file_label: str,
+                       angular_interval: AngularInterval,
+                       log_every_n_photons: int,
+                       spectra: Dict[str, SpectrumCount]):
+
+        for photon_counter, line in enumerate(file):
+
+            photon_info = PhotonInfo.build_photon_info(
+                raw_info=line, policy=self.photon_units_policy)
+
+            if photon_info.phi in angular_interval:
+                self.__register_photon(photon_info, spectra=spectra)
+
+            self.__log_status(
+                file_label=file_label,
+                n_photons_processed=photon_counter,
+                limit=log_every_n_photons)
+
+    def __process_simulation(self, sim_info: AgnSimulationInfo,
+                             spectra: Dict[str, SpectrumCount],
+                             angular_interval: AngularInterval,
+                             log_every_n_photons: int):
+
+        for file_path_i in sim_info.simulation_files:
+            with open(file_path_i) as file_i:
+                self.__process_file(file=file_i,
+                                    file_label=file_path_i,
+                                    angular_interval=angular_interval,
+                                    log_every_n_photons=log_every_n_photons,
+                                    spectra=spectra)
+
+    def __generate_spectrum(self, spectra: Dict[str, SpectrumCount], label: str):
+        spectra[label] = PoissonSpectrumCountFactory.build_log_empty_spectrum_count(
+            hv_left=self.hv_interval.left,
+            hv_right=self.hv_interval.right,
+            n_intervals=self.hv_n_intervals
+        )
 
 
-nh_grid = ColumnDensityGrid(
-    left_nh=LEFT_NH, right_nh=RIGHT_NH, n_intervals=NH_INTERVALS)
+def print_spectra(output_dir: str, spectra: Dict[str, SpectrumCount]):
 
-print(nh_grid.index(nh=1e24))
+    print('printing ...')
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
 
-print(nh_grid.nh_list)
+    for spectrum_key in spectra:
+        path_to_spectrum_file = os.path.join(
+            output_dir, f'{spectrum_key}.spectrum')
+
+        with open(path_to_spectrum_file, mode='w') as file:
+
+            for spectrum in spectra[spectrum_key]:
+                file.write(f'{spectrum.x:0.1f}  {spectrum.y:0.1f}\n')
+
+    print('done!')
+# nh_grid = ColumnDensityGrid(
+#     left_nh=LEFT_NH, right_nh=RIGHT_NH, n_intervals=NH_INTERVALS)
+
+# print(nh_grid.index(nh=1e24))
+
+# print(nh_grid.nh_list)
