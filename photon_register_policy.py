@@ -70,6 +70,24 @@ FLUORESCENT_LINES_LABELS: Final[Dict[str, float]] = {
 }
 
 
+def _photon_file_line_interpretation(line: str):
+    items = line.split()
+
+    if len(items) == 7:
+        hv_str, theta_str, phi_str, photon_type_str, line_str, n_clouds_str, effective_length_str = items
+        n_scatterings_str = '-1'
+        total_path_str = '-1'
+        x_str = y_str = z_str = '-1'
+
+    elif len(items) == 12:
+        hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, n_clouds_str, x_str, y_str, z_str, effective_length_str = items
+    else:
+        raise ValueError(
+            f'The line: "{line}" cannot be interpreted as a simulation photon information.')
+
+    return hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, n_clouds_str, x_str, y_str, z_str, effective_length_str
+
+
 class PhotonType:
 
     def __init__(self, type_label: str):
@@ -174,9 +192,13 @@ class PhotonRawInfo:
     by the photon's escape line
     """
 
+    photon_line_interpretation_policy = _photon_file_line_interpretation
+
     @staticmethod
     def build_photon_raw_info(raw_info: str) -> PhotonRawInfo:
-        hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, n_clouds_str, x_str, y_str, z_str, effective_length_str = raw_info.split()
+        hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, n_clouds_str, x_str, y_str, z_str, effective_length_str = PhotonRawInfo.photon_line_interpretation_policy(
+            raw_info)
+
         return PhotonRawInfo(
             hv=float(hv_str),
             theta=float(theta_str),

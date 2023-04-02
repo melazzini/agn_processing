@@ -39,7 +39,7 @@ def get_interval_index_log(value: float, value_interval: Interval2D, num_of_inte
     Returns:
         int: the value interval index
     """
-    return round(num_of_intervals * (np.log(value/value_interval.left))/(np.log(value_interval.right/value_interval.left)))
+    return int(num_of_intervals * (np.log10(value/value_interval.left))/(np.log10(value_interval.right/value_interval.left)))
 
 
 class SpectrumBase:
@@ -283,6 +283,11 @@ class PoissonSpectrumCountFactory:
 
 def count_photon_into_log_spectrum(spectrum: SpectrumCount, hv: float):
     index = get_interval_index_log(hv, spectrum.interval, len(spectrum))
+    
+    if index>=2000:
+        print(f'The energy of the photon is: {hv}')
+        print(f'The energy-index of the photon is: {index}')
+    
     spectrum[index].y += 1
     spectrum[index].y_err = spectrum[index].y**0.5
 

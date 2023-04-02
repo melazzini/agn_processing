@@ -42,7 +42,7 @@ from math import radians
 # print(agn_info)
 
 sim_info = AgnSimulationInfo.build_agn_simulation_info(
-    '/home/francisco/Projects/agn/columndensity/build/results/test')
+    '/home/francisco/Projects/agn/columndensity3/build/results/23_5_03_1xfe')
 
 builder = SpectraBuilder(sim_info=sim_info,
                          photon_registration_policy=NHPhotonRegistrationPolicy(simulation_info=sim_info))
@@ -51,4 +51,4 @@ builder = SpectraBuilder(sim_info=sim_info,
 spectra = builder.build(translate_zenit(AngularInterval(
     beg=radians(60), length=radians(15))))
 
-print_spectra(output_dir='/home/francisco/Projects/agn/columndensity/build/results/test/outputdir',spectra=spectra)
+print_spectra(output_dir='/home/francisco/Projects/agn/columndensity3/build/results/23_5_03_1xfe/THETA_6075_nh_grid',spectra=spectra)
