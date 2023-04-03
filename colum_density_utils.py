@@ -1,7 +1,7 @@
 """
 ==================================
 
-Example: 'how to build a column density list from a file with effective lengths'
+Example-01: 'how to build a column density list from a file with effective lengths'
 
 effective_lengths = get_effective_lengths(
     path_to_effective_lengths_file="/path/to/effectiveLengths")
@@ -15,14 +15,30 @@ effective_lengths=effective_lengths, sim_info=sim_info)
 print(nh_list)
 
 ==================================
-"""
 
+
+==================================
+
+Example: 'How to build and use a column density distribution'
+
+# See Example-01 to build the nh_list
+
+nh_distribution = ColumnDensityDistribution(grid=grid, nh_list=nh_list)
+
+print(*[f'{nh_i:>8.3g}: {nh_distribution.get_distribution_value_for_nh(nh_i):>8.3g}'
+      for nh_i in np.logspace(start=22, stop=24, num=30)], sep='\n')
+      
+      
+==================================
+
+"""
 
 
 from utils import *
 from agn_utils import AgnSimulationInfo
 import pint
 from agn_simulation_policy import AGN_SIMULATION_UNITS, AGN_PROCESSING_UNITS
+from agn_processing_policy import LEFT_NH, NH_INTERVALS, RIGHT_NH
 
 
 class ColumnDensityInterval(Interval2D):
@@ -151,11 +167,23 @@ def build_nh_list_from_effective_lengths(effective_lengths: np.ndarray, sim_info
     return effective_lengths*hydrogen_concentration
 
 
-
-
 class ColumnDensityDistribution:
 
     def __init__(self, grid: ColumnDensityGrid, nh_list: np.ndarray):
         self.grid = grid
-        self.nh_list = nh_list
-        self.histogram = Histo(None, None, None)
+        self._histogram = Histo(bins=np.array(self.grid.nh_list), counts=np.zeros(
+            self.grid.n_intervals), raw_data=nh_list)
+        self._build_histogram(histogram=self._histogram)
+
+    def _build_histogram(self, histogram: Histo):
+        for nh_i in histogram.raw_data:
+            index = self.grid.index(nh_i)
+            histogram.counts[index] += 1
+
+        histogram.counts /= sum(histogram.counts)
+
+    def get_distribution_value_for_nh(self, nh: float) -> float:
+        return self._histogram.counts[self.grid.index(nh=nh)]
+
+
+
