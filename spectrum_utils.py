@@ -1,12 +1,14 @@
 from __future__ import annotations
 from typing import Final, List, Dict, Iterable, Set
 from utils import *
-from agn_utils import AgnSimulationInfo
+from agn_utils import AgnSimulationInfo, AGN_SOURCE_DATA_STORAGE_PREFIX
 from colum_density_utils import ColumnDensityGrid, get_hydrogen_concentration
 from agn_processing_policy import *
 from photon_register_policy import PhotonInfo, PhotonType, AgnPhotonUnitsPolicy
 from io import TextIOWrapper
 import os
+import subprocess
+from paths_in_this_machine import PATH_TO_CREATE_SOURCE_SPECTRA_DIR
 
 """TODO"""
 SPECTRUM_PHOTON_TYPES_LABELS: Final[Dict[str, float]] = {
@@ -28,7 +30,7 @@ class SpectrumBaseItem:
 
 
 def get_interval_index_log(value: float, value_interval: Interval2D, num_of_intervals: int) -> int:
-    """Returns the index of the value interval corresponding to the given value. 
+    """Returns the interval index corresponding to the given value. 
     The whole value interval is in a log10 scale
 
     Args:
@@ -283,11 +285,11 @@ class PoissonSpectrumCountFactory:
 
 def count_photon_into_log_spectrum(spectrum: SpectrumCount, hv: float):
     index = get_interval_index_log(hv, spectrum.interval, len(spectrum))
-    
-    if index>=2000:
+
+    if index >= 2000:
         print(f'The energy of the photon is: {hv}')
         print(f'The energy-index of the photon is: {index}')
-    
+
     spectrum[index].y += 1
     spectrum[index].y_err = spectrum[index].y**0.5
 
@@ -426,3 +428,53 @@ def print_spectra(output_dir: str, spectra: Dict[str, SpectrumCount]):
                 file.write(f'{spectrum.x:0.1f}  {spectrum.y:0.1f}\n')
 
     print('done!')
+
+
+class SourceSpectrumCountFileGenerator:
+
+    def __init__(self, root_dir):
+        self.root_dir = root_dir
+
+    def generate(self, num_of_photons: float, bins: int = 2000) -> str:
+
+        new_source = f"source_S_{int(bins/1000)}k_{int(num_of_photons/1e6)}M.txt"
+
+        path = os.path.join(self.root_dir, new_source)
+
+        if not os.path.exists(path):
+            if bins == 2000:
+                subprocess.call([os.path.join(PATH_TO_CREATE_SOURCE_SPECTRA_DIR, 'create_source'),
+                                str(num_of_photons), path])
+            elif bins == 5000:
+                subprocess.call([os.path.join(PATH_TO_CREATE_SOURCE_SPECTRA_DIR, 'create_source_5k'),
+                                str(num_of_photons), path])
+            elif bins == 10_000:
+                subprocess.call([os.path.join(PATH_TO_CREATE_SOURCE_SPECTRA_DIR, 'create_source_10k'),
+                                str(num_of_photons), path])
+            elif bins == 30_000:
+                subprocess.call([os.path.join(PATH_TO_CREATE_SOURCE_SPECTRA_DIR, 'create_source_30k'),
+                                str(num_of_photons), path])
+            else:
+                ValueAndError
+
+        return path
+
+
+def generate_source_spectrum_count_file(num_of_photons: float, bins=2000) -> str:
+    """
+    =================================
+
+    path_to_source_spectrum = generate_source_spectrum_count_file(
+    num_of_photons=500_000000, bins=2000)
+
+    print(f'path to source spectrum: {path_to_source_spectrum}')
+
+    Args:
+        num_of_photons (float): _description_
+        bins (int, optional): _description_. Defaults to 2000.
+
+    Returns:
+        str: _description_
+    """
+
+    return SourceSpectrumCountFileGenerator(AGN_SOURCE_DATA_STORAGE_PREFIX).generate(num_of_photons, bins=bins)

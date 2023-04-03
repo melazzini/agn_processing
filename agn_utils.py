@@ -5,6 +5,9 @@ import numpy as np
 from utils import *
 
 
+AGN_SOURCE_DATA_STORAGE_PREFIX: Final[str] = "/home/francisco/Projects/agn/agn_processing/results/source_spectra"
+
+
 @dataclass
 class AgnSimulationInfo:
     """
@@ -156,3 +159,19 @@ def translate_zenit(zenith_angular_interval: AngularInterval)->AngularInterval:
         
         beg = np.pi/2 - zenith_angular_interval.end
         return AngularInterval(beg=beg, length=zenith_angular_interval.length)
+    
+
+
+def agn_solid_angle(theta: AngularInterval) -> float:
+    """Returns the doubled solid angle for
+    the corresponding agn viewing angular interval
+
+    Args:
+        theta (AngularInterval) 
+
+    Returns:
+        float: the solid angle
+    """
+    solid_angle_up = solid_angle(theta.beg)
+    solid_angle_base = solid_angle(theta.beg+theta.length)
+    return 2*(solid_angle_base - solid_angle_up)
