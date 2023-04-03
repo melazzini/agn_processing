@@ -184,6 +184,3 @@ class ColumnDensityDistribution:
 
     def get_distribution_value_for_nh(self, nh: float) -> float:
         return self._histogram.counts[self.grid.index(nh=nh)]
-
-
-
