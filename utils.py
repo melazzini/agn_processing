@@ -217,3 +217,44 @@ class UnitsPolicy(ABC):
     @abstractmethod
     def translate_angle(self, value: float) -> float:
         pass
+
+
+@dataclass
+class Histo:
+    """This class represents a histogram.
+    
+    This class holds the raw data, because this
+    is usually convenient for different calculations.
+    
+    Plus it provides basic statistical methods: mean and std.
+    """
+    bins: np.ndarray
+    counts: np.ndarray
+    raw_data: np.ndarray
+
+    def mean(self)->float:
+        """Get the mean of the raw data described by the histogram.
+        
+        This value is calculated every time you call this method.
+        Thus: 
+                Cache this value for performance!
+
+        Returns:
+            float: mean value of the raw data.
+        """
+        
+        return np.mean(self.raw_data)
+
+    def std(self)->float:
+        """Get the std of the raw data described by the histogram.
+        
+        This value is calculated every time you call this method.
+        Thus: 
+                Cache this value for performance!
+                
+        Returns:
+            float: standard deviation of the raw data.
+        """
+        mean_ = self.mean()
+        n = len(self.raw_data)
+        return np.sqrt(sum(((self.raw_data-mean_)**2)/n))/mean_
