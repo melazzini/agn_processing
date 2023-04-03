@@ -15,7 +15,7 @@ _AGN_SIMULATION_INFO_FILE_POSSIBLE_NAMES: Final[List[str]] = [
 _AGN_CLOUDS_FILE_NAME: Final[str] = 'clouds.txt'
 _AGN_SIMULATION_LABEL_HINT = 'thread'
 
-_AGN_SIMULATION_UNITS: Final[Dict[str, str]] = {
+AGN_SIMULATION_UNITS: Final[Dict[str, str]] = {
     LENGTH: 'meters',
     TIME: 'seconds',
     MASS: 'kilograms',
@@ -25,7 +25,7 @@ _AGN_SIMULATION_UNITS: Final[Dict[str, str]] = {
     N_H_DIM: '1/m^2'
 }
 
-_AGN_PROCESSING_UNITS: Final[Dict[str, str]] = {
+AGN_PROCESSING_UNITS: Final[Dict[str, str]] = {
     LENGTH: 'cm',
     TIME: 'seconds',
     MASS: 'grams',
@@ -239,4 +239,4 @@ class AgnSimulationPolicy:
         return result
 
     def __translate_from_sim_to_processing_units(self, value, dimensionality: str):
-        return (value*self.ureg[_AGN_SIMULATION_UNITS[dimensionality]]).to(self.ureg[_AGN_PROCESSING_UNITS[dimensionality]]).magnitude
+        return (value*self.ureg[AGN_SIMULATION_UNITS[dimensionality]]).to(self.ureg[AGN_PROCESSING_UNITS[dimensionality]]).magnitude

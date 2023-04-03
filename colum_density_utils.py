@@ -1,4 +1,28 @@
+"""
+==================================
+
+Example: 'how to build a column density list from a file with effective lengths'
+
+effective_lengths = get_effective_lengths(
+    path_to_effective_lengths_file="/path/to/effectiveLengths")
+
+sim_info = AgnSimulationInfo.build_agn_simulation_info(
+sim_root_dir="/path/to/sim_root_dir")
+
+nh_list = build_nh_list_from_effective_lengths(
+effective_lengths=effective_lengths, sim_info=sim_info)
+
+print(nh_list)
+
+==================================
+"""
+
+
+
 from utils import *
+from agn_utils import AgnSimulationInfo
+import pint
+from agn_simulation_policy import AGN_SIMULATION_UNITS, AGN_PROCESSING_UNITS
 
 
 class ColumnDensityInterval(Interval2D):
@@ -105,3 +129,33 @@ def get_hydrogen_concentration(aver_column_density: float,
                                  external_torus_radius=1e15))
     """
     return aver_column_density/(filling_factor*(external_torus_radius-internal_torus_radius))
+
+
+def _get_multiplication_factor_to_translate_from_sim_to_processing_units(dimensionality: str) -> float:
+    ureg = pint.UnitRegistry()
+    return (1.0*ureg[AGN_SIMULATION_UNITS[dimensionality]]).to(ureg[AGN_PROCESSING_UNITS[dimensionality]]).magnitude
+
+
+def get_effective_lengths(path_to_effective_lengths_file: str) -> np.ndarray:
+    data = np.loadtxt(path_to_effective_lengths_file)
+    return data*_get_multiplication_factor_to_translate_from_sim_to_processing_units(dimensionality=LENGTH)
+
+
+def build_nh_list_from_effective_lengths(effective_lengths: np.ndarray, sim_info: AgnSimulationInfo) -> np.ndarray:
+    hydrogen_concentration = get_hydrogen_concentration(aver_column_density=sim_info.nh_aver,
+                                                        filling_factor=sim_info.phi,
+                                                        internal_torus_radius=sim_info.r1,
+                                                        external_torus_radius=sim_info.r2
+                                                        )
+
+    return effective_lengths*hydrogen_concentration
+
+
+
+
+class ColumnDensityDistribution:
+
+    def __init__(self, grid: ColumnDensityGrid, nh_list: np.ndarray):
+        self.grid = grid
+        self.nh_list = nh_list
+        self.histogram = Histo(None, None, None)
