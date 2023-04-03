@@ -426,9 +426,3 @@ def print_spectra(output_dir: str, spectra: Dict[str, SpectrumCount]):
                 file.write(f'{spectrum.x:0.1f}  {spectrum.y:0.1f}\n')
 
     print('done!')
-# nh_grid = ColumnDensityGrid(
-#     left_nh=LEFT_NH, right_nh=RIGHT_NH, n_intervals=NH_INTERVALS)
-
-# print(nh_grid.index(nh=1e24))
-
-# print(nh_grid.nh_list)
