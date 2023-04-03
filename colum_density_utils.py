@@ -169,8 +169,8 @@ def build_nh_list_from_effective_lengths(effective_lengths: np.ndarray, sim_info
 
 class ColumnDensityDistribution:
 
-    def __init__(self, grid: ColumnDensityGrid, nh_list: np.ndarray):
-        self.grid = grid
+    def __init__(self, nh_grid: ColumnDensityGrid, nh_list: np.ndarray):
+        self.grid = nh_grid
         self._histogram = Histo(bins=np.array(self.grid.nh_list), counts=np.zeros(
             self.grid.n_intervals), raw_data=nh_list)
         self._build_histogram(histogram=self._histogram)

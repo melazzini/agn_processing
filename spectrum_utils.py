@@ -74,6 +74,9 @@ class SpectrumBase:
             self.length = len(x)
             self.pos = 0
             self.interval = None
+            self.x = x
+            self.y = y
+            self.y_err = y_err
 
             if interval:
                 self.interval = interval
@@ -231,6 +234,7 @@ class SpectrumCount(SpectrumBase):
             y (Iterable[float]): spectrum values
             y_err (Iterable[float]): errors on the spectrum values
         """
+
         super().__init__(x, y, y_err, interval)
 
 

@@ -1,6 +1,12 @@
 from spectrum_utils import *
 from typing import Final, List, Dict, Iterable, Set
 from colum_density_utils import ColumnDensityDistribution
+from agn_utils import agn_solid_angle
+
+FULL_TORUS_ANGLE_DEG = AngularInterval(60, 30)
+
+FULL_TORUS_SOLID_ANGLE = agn_solid_angle(
+    FULL_TORUS_ANGLE_DEG.from_deg_to_rad())
 
 
 @dataclass
@@ -8,6 +14,14 @@ class NormalizationFluxDensityParameters:
     energy_norm_value: float
     energy_interval: EnergyInterval
     solid_angle: float
+
+
+SIMULATION_NORM_ENERGY_EV = 1_000
+SIMULATION_ENERGY_INTERVAL_EV = EnergyInterval(100, 300_000)
+
+NORMALIZATION_SIMULATION_PARAMS = NormalizationFluxDensityParameters(energy_norm_value=SIMULATION_NORM_ENERGY_EV,
+                                                                     solid_angle=FULL_TORUS_SOLID_ANGLE,
+                                                                     energy_interval=SIMULATION_ENERGY_INTERVAL_EV)
 
 
 def build_log10_energy_widths(energy_interval: EnergyInterval, n_intervals: int) -> np.ndarray:
@@ -89,11 +103,11 @@ class FluxDensityBuilder:
 
     @staticmethod
     def build_flux_density_for_given_nh(spectrum_count: SpectrumCount,
-              norm_spectrum: SpectrumCount,
-              angle_interval: AngularInterval,
-              nh:float,
-              nh_distribution:ColumnDensityDistribution,
-              norm_params: NormalizationFluxDensityParameters):
+                                        norm_spectrum: SpectrumCount,
+                                        angle_interval: AngularInterval,
+                                        nh: float,
+                                        nh_distribution: ColumnDensityDistribution,
+                                        norm_params: NormalizationFluxDensityParameters=NORMALIZATION_SIMULATION_PARAMS):
         """Builds the flux density
 
         Args:
@@ -107,20 +121,20 @@ class FluxDensityBuilder:
         """
 
         energy_widths = build_log10_energy_widths(energy_interval=norm_params.energy_interval,
-                                                  num_of_intervals=len(norm_spectrum))
+                                                  n_intervals=len(norm_spectrum))
 
         norm_factor = get_normalization_factor(
             norm_params, norm_spectrum, energy_widths)
 
         solid_angle_ = FluxDensityBuilder._get_solid_angle(angle_interval)
 
-        true_solid_angle =nh_distribution.get_distribution_value_for_nh(nh=nh) *solid_angle_
+        true_solid_angle = nh_distribution.get_distribution_value_for_nh(
+            nh=nh) * solid_angle_
 
         return FluxDensity(spectrum_count.x,
-                            spectrum_count.x*spectrum_count.y*norm_factor /
-                            true_solid_angle/energy_widths,
-                            spectrum_count.x*spectrum_count.y_err*norm_factor/true_solid_angle/energy_widths)
-
+                           spectrum_count.x*spectrum_count.y*norm_factor /
+                           true_solid_angle/energy_widths,
+                           spectrum_count.x*spectrum_count.y_err*norm_factor/true_solid_angle/energy_widths)
 
     @staticmethod
     def _get_solid_angle(angle_interval: float):
