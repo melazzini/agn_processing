@@ -3,7 +3,7 @@ from typing import Final, List, Dict, Iterable, Set
 from colum_density_utils import ColumnDensityDistribution
 from agn_utils import agn_solid_angle
 
-FULL_TORUS_ANGLE_DEG = AngularInterval(60, 30)
+FULL_TORUS_ANGLE_DEG = AngularInterval(0, 90)
 
 FULL_TORUS_SOLID_ANGLE = agn_solid_angle(
     FULL_TORUS_ANGLE_DEG.from_deg_to_rad())
@@ -61,6 +61,11 @@ def get_normalization_factor(norm_params: NormalizationFluxDensityParameters, no
     norm_spectrum_count = norm_spectrum[index].y
     norm_solid_angle = norm_params.solid_angle
 
+    # print(index)
+    # print(norm_spectrum_count)
+    # print(norm_energy_width)
+    # print(norm_solid_angle)
+
     return (norm_solid_angle*norm_energy_width)/norm_spectrum_count
 
 
@@ -107,8 +112,11 @@ class FluxDensityBuilder:
                                         angle_interval: AngularInterval,
                                         nh: float,
                                         nh_distribution: ColumnDensityDistribution,
-                                        norm_params: NormalizationFluxDensityParameters=NORMALIZATION_SIMULATION_PARAMS):
-        """Builds the flux density
+                                        norm_params: NormalizationFluxDensityParameters = NORMALIZATION_SIMULATION_PARAMS)->FluxDensity:
+        """Builds the flux density.
+
+                DONT USE THIS METHOD TO CREATE THE NORMALIZATION FLUX DENSITY!
+                The normalization of the Normalization-Flux-Density is different.
 
         Args:
             spectrum_count (SpectrumCount): This spectrum count is made out of ALL components that count for the given flux density.
@@ -117,7 +125,7 @@ class FluxDensityBuilder:
             norm_params (NormalizationFluxDensityParameters): Normalization parameters. Typically these should be global (use the default value).
 
         Returns:
-            _type_: _description_
+            FluxDensity: The normalized flux density.
         """
 
         energy_widths = build_log10_energy_widths(energy_interval=norm_params.energy_interval,
@@ -135,6 +143,37 @@ class FluxDensityBuilder:
                            spectrum_count.x*spectrum_count.y*norm_factor /
                            true_solid_angle/energy_widths,
                            spectrum_count.x*spectrum_count.y_err*norm_factor/true_solid_angle/energy_widths)
+
+    @staticmethod
+    def build_norm_flux_density(
+            norm_spectrum: SpectrumCount,
+            angle_interval: AngularInterval,
+            norm_params: NormalizationFluxDensityParameters = NORMALIZATION_SIMULATION_PARAMS):
+        """Builds the normalization flux density.
+
+        Args:
+            norm_spectrum (SpectrumCount): This is the normalization spectrum, which normally it is the source spectrum.
+            angle_interval (AngularInterval): Angle interval at which the given spectral components were taken
+            norm_params (NormalizationFluxDensityParameters): Normalization parameters. Typically these should be global (use the default value).
+
+        Returns:
+            _type_: _description_
+        """
+
+        energy_widths = build_log10_energy_widths(energy_interval=norm_params.energy_interval,
+                                                  n_intervals=len(norm_spectrum))
+
+        norm_factor = get_normalization_factor(
+            norm_params, norm_spectrum, energy_widths)
+
+        solid_angle_ = FluxDensityBuilder._get_solid_angle(angle_interval)
+
+        true_solid_angle = solid_angle_
+
+        return FluxDensity(norm_spectrum.x,
+                           norm_spectrum.x*norm_spectrum.y*norm_factor /
+                           true_solid_angle/energy_widths,
+                           norm_spectrum.x*norm_spectrum.y_err*norm_factor/true_solid_angle/energy_widths)
 
     @staticmethod
     def _get_solid_angle(angle_interval: float):

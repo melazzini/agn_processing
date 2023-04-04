@@ -3,15 +3,16 @@ from agn_simulation_policy import *
 from functools import reduce
 import numpy as np
 from utils import *
+from paths_in_this_machine import AGN_SOURCE_DATA_STORAGE_DIR
 
 
-AGN_SOURCE_DATA_STORAGE_PREFIX: Final[str] = "/home/francisco/Projects/agn/agn_processing/results/source_spectra"
+AGN_SOURCE_DATA_STORAGE_PREFIX: Final[str] = AGN_SOURCE_DATA_STORAGE_DIR
 
 
 @dataclass
 class AgnSimulationInfo:
     """
-    
+
     This class represents all the necessary information
     to process the agn simulation data.
 
@@ -145,21 +146,20 @@ class AgnSimulationInfo:
         )
 
 
-def translate_zenit(zenith_angular_interval: AngularInterval)->AngularInterval:
-        """You pass it an angular interval seen from the oz axis
-        and it gives you the corresponding angular interval
-        but seen from the oxy plane.
+def translate_zenit(zenith_angular_interval: AngularInterval) -> AngularInterval:
+    """You pass it an angular interval seen from the oz axis
+    and it gives you the corresponding angular interval
+    but seen from the oxy plane.
 
-        Args:
-            zenith_angular_interval (AngularInterval): angular interval seen from the oz axis
+    Args:
+        zenith_angular_interval (AngularInterval): angular interval seen from the oz axis
 
-        Returns:
-            AngularInterval: angular interval seen from the oxy plane
-        """
-        
-        beg = np.pi/2 - zenith_angular_interval.end
-        return AngularInterval(beg=beg, length=zenith_angular_interval.length)
-    
+    Returns:
+        AngularInterval: angular interval seen from the oxy plane
+    """
+
+    beg = np.pi/2 - zenith_angular_interval.end
+    return AngularInterval(beg=beg, length=zenith_angular_interval.length)
 
 
 def agn_solid_angle(theta: AngularInterval) -> float:
