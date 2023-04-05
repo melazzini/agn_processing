@@ -41,6 +41,7 @@ _AGN_SIMULATION_INFO_FILE_EXTERNAL_RADIUS_KEY = "External Radius"
 _AGN_SIMULATION_INFO_FILE_HALF_OPENING_ANGLE_KEY = "Half Opening-angle"
 _AGN_SIMULATION_INFO_FILE_COLUMN_DENSITY_KEY = "Column Density"
 _AGN_SIMULATION_INFO_FILE_AVER_N_CLOUDS_KEY = "Average Number(sightline) of Clouds"
+_AGN_SIMULATION_INFO_FILE_AVER_N_CLOUDS_KEY_VARIANT2 = "Average Number(sight line) of Clouds"
 _AGN_SIMULATION_INFO_FILE_FILLING_FACTOR_KEY = "Volume Filling Factor"
 _AGN_SIMULATION_INFO_FILE_N_PHOTONS_KEY = "Number of Photons"
 _AGN_SIMULATION_INFO_FILE_N_CLOUDS_KEY = "Number of Clouds"
@@ -204,8 +205,14 @@ class AgnSimulationPolicy:
             info_dict_raw[_AGN_SIMULATION_INFO_FILE_HALF_OPENING_ANGLE_KEY])
         nh_aver = float(
             info_dict_raw[_AGN_SIMULATION_INFO_FILE_COLUMN_DENSITY_KEY])
-        n_aver = int(
-            info_dict_raw[_AGN_SIMULATION_INFO_FILE_AVER_N_CLOUDS_KEY])
+
+        try:
+            n_aver = int(
+                info_dict_raw[_AGN_SIMULATION_INFO_FILE_AVER_N_CLOUDS_KEY])
+        except KeyError as e:
+            n_aver = int(
+                info_dict_raw[_AGN_SIMULATION_INFO_FILE_AVER_N_CLOUDS_KEY_VARIANT2])
+
         phi = float(
             info_dict_raw[_AGN_SIMULATION_INFO_FILE_FILLING_FACTOR_KEY])
         n_photons = float(
