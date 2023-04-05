@@ -39,16 +39,8 @@ plt.grid()
 
 plt.plot(source_flux_density.x, source_flux_density.y, label='source')
 
-x, y_continuum = x_y(
-    "/media/francisco/repo/62322/AGN_REPO/repo/N_H_23/23_-1_03_1xfe/THETA_6075/CONTINUUM_6075.txt")
-x, y_fekalpha = x_y(
-    "/media/francisco/repo/62322/AGN_REPO/repo/N_H_23/23_-1_03_1xfe/THETA_6075/FeKalpha.txt")
 
-plt.plot(x, y_continuum + y_fekalpha, label = "smooth")
-
-# exit(-1)
-
-for nh in nh_grid.nh_list[3:4]:
+for nh in nh_grid.nh_list[1:9:2]:
 
     index = nh_grid.index(nh)
 
@@ -71,23 +63,7 @@ for nh in nh_grid.nh_list[3:4]:
                                                                                nh=nh, nh_distribution=nh_distribution)
 
     plt.plot(flux_density_scattering.x, flux_density_scattering.y +
-             flux_density_no_interactions.y+flux_density_fekalpha.y, label=r'<N> = 5, $N_{H,LOS}=$' f'{nh:0.3g}' r'$cm^{-2}$')
-
-
-x, y_continuum = x_y(
-    "/home/francisco/Projects/agn/agn_processing/results/build/23_5_03_1xfe/THETA_6075/CONTINUUM_6075_N=5.txt")
-x, y_fekalpha = x_y(
-    "/home/francisco/Projects/agn/agn_processing/results/build/23_5_03_1xfe/THETA_6075/FeKalpha5.txt")
-
-plt.plot(x, y_continuum + y_fekalpha, label = r"<N> =N=5")
-
-
-x, y_continuum = x_y(
-    "/media/francisco/repo/62322/AGN_REPO/repo/N_H_23/23_3_03_1xfe/THETA_6075/CONTINUUM_6075_N=3.txt")
-x, y_fekalpha = x_y(
-    "/media/francisco/repo/62322/AGN_REPO/repo/N_H_23/23_3_03_1xfe/THETA_6075/FeKalpha5.txt")
-
-plt.plot(x, y_continuum + y_fekalpha, label = r"<N> =N=3")
+             flux_density_no_interactions.y+flux_density_fekalpha.y, label=r'$N_{H,LOS}=$' f'{nh:0.3g}' r'$cm^{-2}$')
 
 
 plt.legend(prop={'size': 9})
@@ -104,6 +80,6 @@ plt.subplots_adjust(
 plt.xlabel(r'$eV$')
 plt.ylabel(r'$E\frac{dN}{dE},\frac{eV}{cm^{2}eV}$')
 plt.title(
-    r'$<N_H> = 10^{23} cm^{-2}$, $\alpha=60^{\circ}$, $A_{Fe}=1$, Continuum + Fe-K$\alpha$')
+    r'$<N_H> = 10^{23} cm^{-2}$,<N> = 5, $\alpha=60^{\circ}$, $A_{Fe}=1$, Continuum + Fe-K$\alpha$')
 plt.xlim(100, 300_000)
 plt.show()
