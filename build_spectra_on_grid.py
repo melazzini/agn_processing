@@ -7,10 +7,7 @@ only valid simulations, and not other directories.
 
 The resulting spectra will be stored in 
     
-    /sim-root-dir/THETA_{angleInterval}_nh_grid_{NH_INTERVALS}/
-
-We are using the global flag NH_INTERVAL to mark how many intervals
-are considered in the grid that corresponds to the obtained spectra.
+    /sim-root-dir/THETA_{angleInterval}_nh_grid_{nh_intervals}_{nh_left}_{nh_right}/
 """
 
 
