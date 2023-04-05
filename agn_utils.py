@@ -94,6 +94,23 @@ class AgnSimulationInfo:
     """Paths to the simulation files.
     """
 
+    is_smooth: bool
+    """
+    This is a convenient utility for processing the simulation
+    in case it is a smooth torus agn.
+    
+    We define smooth torus as:
+    
+        n_clouds==n_aver==r_clouds==0
+        
+        
+    We don't show this information in the __str__() magic because
+    it is redundant.
+    """
+
+    def _is_smooth(p: AgnSimulationPolicy):
+        return p.get_aver_n_clouds() == p.get_n_clouds() == p.get_r_clouds() == 0
+
     def __str__(self):
         sim_metadata = f'Simulation root directory: {self.sim_root_dir}\n'\
             f'Info file path           : {self.file_path}\n'\
@@ -126,11 +143,13 @@ class AgnSimulationInfo:
 
         info_file_path = get_info_file_path(sim_root_dir)
         policy = AgnSimulationPolicy(info_file_path)
+        is_smooth = AgnSimulationInfo._is_smooth(policy)
 
         return AgnSimulationInfo(
             sim_root_dir=sim_root_dir,
             file_path=info_file_path,
-            clouds_file_path=get_clouds_file_path(sim_root_dir),
+            clouds_file_path=get_clouds_file_path(
+                sim_root_dir) if not is_smooth else "",
             r1=policy.get_internal_radius(),
             r2=policy.get_external_radius(),
             theta=policy.get_half_opening_angle(),
@@ -142,7 +161,8 @@ class AgnSimulationInfo:
             r_clouds=policy.get_r_clouds(),
             temperature_e=policy.get_temperature_electrons(),
             other_parameters=policy.get_other_extra_parameters(),
-            simulation_files=get_simulation_files_list(sim_root_dir)
+            simulation_files=get_simulation_files_list(sim_root_dir),
+            is_smooth=is_smooth
         )
 
 
