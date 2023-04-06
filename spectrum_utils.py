@@ -8,7 +8,7 @@ from photon_register_policy import PhotonInfo, PhotonType, AgnPhotonUnitsPolicy
 from io import TextIOWrapper
 import os
 import subprocess
-from paths_in_this_machine import PATH_TO_CREATE_SOURCE_SPECTRA_DIR
+from paths_in_this_machine import PATH_TO_CREATE_SOURCE_SPECTRA_DIR, ERRORS_LOG_FILE
 
 """TODO"""
 SPECTRUM_PHOTON_TYPES_LABELS: Final[Dict[str, float]] = {
@@ -287,15 +287,70 @@ class PoissonSpectrumCountFactory:
         return SpectrumCount(x, y, y_err, EnergyInterval(hv_left, hv_right))
 
 
-def count_photon_into_log_spectrum(spectrum: SpectrumCount, hv: float):
-    index = get_interval_index_log(hv, spectrum.interval, len(spectrum))
+def _validate_index(index: int, hv: float, log_info: any = None) -> int:
+    """There might be rare cases when the energy of the photon is out of the bounds.
+    When this happens we can get exceptions in python when using the corresponding
+    wrong indexes, thus we need to check the index values before using them.
 
+    However, those cases are very rare and near the bounds so, we simply
+    count those photons near the limits on the energy interval.
+
+    This is an optional step and we can handle it in different ways according to the needs.
+
+    Args:
+        index (int): Apparent Index of the photon, which we seek to validate
+        hv (float): Energy of the photon, for login info
+        log_info (any, optional): Extra log info. Defaults to None.
+
+    Returns:
+        int: The validated index.
+    """
     if index >= 2000:
-        print(f'The energy of the photon is: {hv}')
-        print(f'The energy-index of the photon is: {index}')
+
+        if os.path.getsize(ERRORS_LOG_FILE) > 1E9:
+            os.remove(ERRORS_LOG_FILE)
+
+        with open(ERRORS_LOG_FILE, '+a') as f:
+
+            if log_info:
+                f.write(f'{log_info}\n')
+
+            f.write(f'The energy of the photon is: {hv}\n')
+            f.write(f'The energy-index of the photon is: {index}\n')
+            f.write(
+                f'We count this rare case as being in the last bin of the energy grid.\n')
+            f.write(
+                '========================================================================\n')
+
+        index = 1999
+
+    if index < 0:
+        if os.path.getsize(ERRORS_LOG_FILE) > 1E9:
+            os.remove(ERRORS_LOG_FILE)
+
+        with open(ERRORS_LOG_FILE, '+a') as f:
+            if log_info:
+                f.write(f'{log_info}\n')
+            f.write(f'The energy of the photon is: {hv}\n')
+            f.write(f'The energy-index of the photon is: {index}\n')
+            f.write(
+                f'We count this rare case as being in the first bin of the energy grid.\n')
+            f.write(
+                '========================================================================\n')
+
+        index = 0
+
+    return index
+
+
+def count_photon_into_log_spectrum(spectrum: SpectrumCount, hv: float, optional_log_info: any = None):
+
+    index = _validate_index(index=get_interval_index_log(
+        hv, spectrum.interval, len(spectrum)), hv=hv, log_info=optional_log_info)
 
     spectrum[index].y += 1
     spectrum[index].y_err = spectrum[index].y**0.5
+    return index
 
 
 class PhotonRegistrationPolicy(ABC):
@@ -364,7 +419,7 @@ class SpectraBuilder:
             print(
                 f'Number of photons processed for {file_label}: {n_photons_processed}')
 
-    def __register_photon(self, photon_info: PhotonInfo, spectra: Dict[str, SpectrumCount]):
+    def __register_photon(self, photon_info: PhotonInfo, spectra: Dict[str, SpectrumCount], error_log_info: any = None):
 
         spectrum_label = self.registration_policy.get_label_for_photon(
             photon_info=photon_info)
@@ -374,7 +429,7 @@ class SpectraBuilder:
 
         count_photon_into_log_spectrum(
             spectrum=spectra[spectrum_label],
-            hv=photon_info.hv)
+            hv=photon_info.hv, optional_log_info=error_log_info)
 
     def __process_file(self,
                        file: TextIOWrapper, file_label: str,
@@ -388,7 +443,8 @@ class SpectraBuilder:
                 raw_info=line, policy=self.photon_units_policy)
 
             if photon_info.phi in angular_interval:
-                self.__register_photon(photon_info, spectra=spectra)
+                self.__register_photon(
+                    photon_info, spectra=spectra, error_log_info=f'{file_label}, #{photon_counter}')
 
             self.__log_status(
                 file_label=file_label,

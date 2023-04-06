@@ -80,12 +80,12 @@ def _photon_file_line_interpretation(line: str):
         x_str = y_str = z_str = '-1'
 
     elif len(items) == 12:
-        hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, n_clouds_str, x_str, y_str, z_str, effective_length_str = items
+        hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, x_str, y_str, z_str, n_clouds_str, effective_length_str = items
     else:
         raise ValueError(
             f'The line: "{line}" cannot be interpreted as a simulation photon information.')
 
-    return hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, n_clouds_str, x_str, y_str, z_str, effective_length_str
+    return hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, x_str, y_str, z_str, n_clouds_str, effective_length_str
 
 
 class PhotonType:
@@ -179,12 +179,12 @@ class PhotonRawInfo:
     traveled inside the torus before it was registered
     """
 
-    n_clouds: int
-    """number of clouds on the photon's escape line
-    """
-
     escape_pos: np.ndarray
     """position where the photon was registered
+    """
+
+    n_clouds: int
+    """number of clouds on the photon's escape line
     """
 
     effective_length: float
@@ -193,10 +193,14 @@ class PhotonRawInfo:
     """
 
     photon_line_interpretation_policy = _photon_file_line_interpretation
+    """
+    The order of the items in each line should ALWAYS be:
+    hv, theta, phi, type, line, n_scatterings, total_path, x, y, z, n_clouds, effective_length
+    """
 
     @staticmethod
     def build_photon_raw_info(raw_info: str) -> PhotonRawInfo:
-        hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, n_clouds_str, x_str, y_str, z_str, effective_length_str = PhotonRawInfo.photon_line_interpretation_policy(
+        hv_str, theta_str, phi_str, photon_type_str, line_str, n_scatterings_str, total_path_str, x_str, y_str, z_str, n_clouds_str, effective_length_str = PhotonRawInfo.photon_line_interpretation_policy(
             raw_info)
 
         return PhotonRawInfo(
@@ -207,8 +211,8 @@ class PhotonRawInfo:
             line=FluorescentLine(line_label=line_str),
             n_scatterings=int(n_scatterings_str),
             total_path=float(total_path_str),
-            n_clouds=int(n_clouds_str),
             escape_pos=np.array([float(x_str), float(y_str), float(z_str)]),
+            n_clouds=int(n_clouds_str),
             effective_length=float(effective_length_str)
         )
 
@@ -220,10 +224,10 @@ class PhotonRawInfo:
                f"line               : {str(self.line):>15}\n"\
                f"n_scatterings      : {self.n_scatterings:>15}\n"\
                f"total_path         : {self.total_path:>15}\n"\
-               f"n_clouds           : {self.n_clouds:>15}\n"\
                f"escape x           : {self.escape_pos[0]:>15}\n"\
                f"escape y           : {self.escape_pos[1]:>15}\n"\
                f"escape z           : {self.escape_pos[2]:>15}\n"\
+               f"n_clouds           : {self.n_clouds:>15}\n"\
                f"effective_length   : {self.effective_length:>15}\n"
 
 
@@ -258,12 +262,12 @@ class PhotonInfo:
     traveled inside the torus before it was registered
     """
 
-    n_clouds: int
-    """number of clouds on the photon's escape line
-    """
-
     escape_pos: np.ndarray
     """position where the photon was registered
+    """
+    
+    n_clouds: int
+    """number of clouds on the photon's escape line
     """
 
     effective_length: float
@@ -295,12 +299,12 @@ class PhotonInfo:
             line=photon_raw_info.line,
             n_scatterings=photon_raw_info.n_scatterings,
             total_path=photon_raw_info.total_path,
-            n_clouds=photon_raw_info.n_clouds,
             escape_pos=np.array([
                 policy.translate_length(photon_raw_info.escape_pos[0]),
                 policy.translate_length(photon_raw_info.escape_pos[1]),
                 policy.translate_length(photon_raw_info.escape_pos[2]),
             ]),
+            n_clouds=photon_raw_info.n_clouds,
             effective_length=policy.translate_length(
                 photon_raw_info.effective_length)
         )
@@ -313,8 +317,8 @@ class PhotonInfo:
                f"line               : {str(self.line):>15}\n"\
                f"n_scatterings      : {self.n_scatterings:>15}\n"\
                f"total_path         : {self.total_path:>15}\n"\
-               f"n_clouds           : {self.n_clouds:>15}\n"\
                f"escape x           : {self.escape_pos[0]:>15}\n"\
                f"escape y           : {self.escape_pos[1]:>15}\n"\
                f"escape z           : {self.escape_pos[2]:>15}\n"\
+               f"n_clouds           : {self.n_clouds:>15}\n"\
                f"effective_length   : {self.effective_length:>15}\n"

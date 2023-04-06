@@ -27,7 +27,7 @@ for sim_dir_name in os.listdir(root_dir):
 
     sim_dir = os.path.join(root_dir, sim_dir_name)
 
-    if sim_dir_name == 'past' or 'data' not in os.listdir(sim_dir):
+    if sim_dir_name == 'past' or os.path.isfile(sim_dir) or 'data' not in os.listdir(sim_dir):
         print(f'Unknown directory name: {sim_dir}')
         continue
 
