@@ -177,7 +177,7 @@ class ColumnDensityDistribution:
 
     def _build_histogram(self, histogram: Histo):
         for nh_i in histogram.raw_data:
-            if LEFT_NH <= nh_i <=RIGHT_NH:  
+            if self.grid.left <= nh_i <= self.grid.right:
                 index = self.grid.index(nh_i)
                 histogram.counts[index] += 1
 
