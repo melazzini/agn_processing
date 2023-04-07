@@ -101,7 +101,10 @@ class ColumnDensityGrid:
 
     def __setup_grid(self, nh_bounds_raw):
         for i, nh_left_val in enumerate(nh_bounds_raw[:-1]):
-            self.nh_list += [(nh_left_val+nh_bounds_raw[i+1])/2]
+
+            self.nh_list += [10**((np.log10(nh_left_val) +
+                                  np.log10(nh_bounds_raw[i+1]))/2)]
+
             self.bounds += [ColumnDensityInterval(
                 left=nh_left_val, right=nh_bounds_raw[i+1])]
 
