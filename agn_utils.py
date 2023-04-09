@@ -4,6 +4,7 @@ from functools import reduce
 import numpy as np
 from utils import *
 from paths_in_this_machine import AGN_SOURCE_DATA_STORAGE_DIR
+import os
 
 
 AGN_SOURCE_DATA_STORAGE_PREFIX: Final[str] = AGN_SOURCE_DATA_STORAGE_DIR
@@ -195,3 +196,54 @@ def agn_solid_angle(theta: AngularInterval) -> float:
     solid_angle_up = solid_angle(theta.beg)
     solid_angle_base = solid_angle(theta.beg+theta.length)
     return 2*(solid_angle_base - solid_angle_up)
+
+
+def get_iron_abundance_from_sim_name(simulation_name: str) -> float:
+    """From the simulation name like 23_3_03_1xfe_... it gets
+    the iron abundance (1 in this example).
+
+    Args:
+        simulation_name (str): just the name of the simulation directory, not the full path!
+
+    Returns:
+        float: abundance of iron
+    """
+
+    code = simulation_name.split(
+        sep='_')[AGN_SIMULATION_NAME_POL_IRON_ABUNDANCE_POS]
+
+    return AGN_IRON_ABUNDANCE[code]
+
+
+def get_simulations_in_sims_root_dir(sims_root_dir: str, n_aver: int, a_fe: float) -> List[AgnSimulationInfo]:
+    """From a simulations root directory it returns the simulations that corresponds to the given
+    number of clouds on average and the given Iron abundance.
+
+    This function asumes that the simulations in the given root dir
+    are all of the same (known by the caller) average column density.
+
+    Args:
+        sims_root_dir (str): the simulations root directory
+        n_aver (int): n_aver of clouds
+        a_fe (float): iron abundance
+
+    Returns:
+        List[AgnSimulationInfo]: the corresponding simulations
+    """
+
+    simulations: List[AgnSimulationInfo] = []
+
+    for sim_name in os.listdir(sims_root_dir):
+
+        if "spectral_data" == sim_name or "past" == sim_name:
+            continue
+
+        sim_path = os.path.join(sims_root_dir, sim_name)
+
+        s = AgnSimulationInfo.build_agn_simulation_info(
+            sim_path, lambda x: {AGN_IRON_ABUNDANCE_LABEL: get_iron_abundance_from_sim_name(simulation_name=sim_name)})
+
+        if s.other_parameters[AGN_IRON_ABUNDANCE_LABEL] == a_fe and s.n_aver == n_aver:
+            simulations += [s]
+
+    return simulations

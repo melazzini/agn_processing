@@ -14,6 +14,18 @@ _AGN_SIMULATION_INFO_FILE_POSSIBLE_NAMES: Final[List[str]] = [
 _AGN_CLOUDS_FILE_NAME: Final[str] = 'clouds.txt'
 _AGN_SIMULATION_LABEL_HINT = 'thread'
 
+AGN_SIMULATION_NAME_POL_IRON_ABUNDANCE_POS = 3
+AGN_IRON_ABUNDANCE_LABEL = 'a_fe'
+
+AGN_IRON_ABUNDANCE: Final[Dict[str, float]] = {
+    "05xfe": 0.5,
+    "07xfe": 0.7,
+    "1xfe": 1,
+    "15xfe": 1.5,
+    "2xfe": 2,
+}
+
+
 AGN_SIMULATION_UNITS: Final[Dict[str, str]] = {
     LENGTH: 'meters',
     TIME: 'seconds',
