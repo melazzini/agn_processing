@@ -65,7 +65,7 @@ continuum_spectra = build_continuum_spectra_map(
     grouped_spectra=grouped_spectra)
 
 
-data_map = build_key_continuum_spectrum_flux_density_map(
+data_map = build_key_spectrum_flux_density_map(
     grouped_spectra=continuum_spectra,
     nh_distribution=nh_distribution,
     source_spectrum=source_spectrum,
@@ -80,7 +80,7 @@ for k in AGN_VIEWING_DIRECTIONS_DEG:
         break
 
 for kind in data_map:
-    label = f'{get_nh_aver_label(sims_root_dir=sims_root_dir)}_{n_aver}_{IRON_ABUNDANCES[a_fe]}_{alpha_lbl}_{kind.grid_id}_{NH_INTERVALS}_{LEFT_NH:0.2g}_{RIGHT_NH:0.2g}_{kind.type_label}'
+    label = f'{get_nh_aver_label(sims_root_dir=sims_root_dir)}_{n_aver}_{IRON_ABUNDANCES[a_fe]}_{alpha_lbl}_{NH_INTERVALS}_{LEFT_NH:0.2g}_{RIGHT_NH:0.2g}_{kind}'
 
     spectral_data_dir = os.path.join(sims_root_dir, 'spectral_data')
 
@@ -92,11 +92,38 @@ for kind in data_map:
     print_spectra(spectral_data_dir, {label+'.fluxdensity': data_map[kind][1]})
 
 
-x, y = x_y("/home/francisco/Projects/agn/agn_processing/results/temporary_links/spectral_data/523_2_1xfe_6075_15_40_8.9e+21_8.9e+25_CONTINUUM.fluxdensity")
+fekalpha_spectra = build_fekalpha_spectra_map(
+    grouped_spectra=grouped_spectra)
 
+
+data_map = build_key_spectrum_flux_density_map(
+    grouped_spectra=fekalpha_spectra,
+    nh_distribution=nh_distribution,
+    source_spectrum=source_spectrum,
+    alpha_deg=alpha)
+
+
+for kind in data_map:
+    label = f'{get_nh_aver_label(sims_root_dir=sims_root_dir)}_{n_aver}_{IRON_ABUNDANCES[a_fe]}_{alpha_lbl}_{NH_INTERVALS}_{LEFT_NH:0.2g}_{RIGHT_NH:0.2g}_{kind}'
+
+    spectral_data_dir = os.path.join(sims_root_dir, 'spectral_data')
+
+    if not os.path.exists(spectral_data_dir):
+        os.mkdir(spectral_data_dir)
+
+    print_spectra(spectral_data_dir, {label+'.spectrum': data_map[kind][0]})
+
+    print_spectra(spectral_data_dir, {label+'.fluxdensity': data_map[kind][1]})
+
+x, y = x_y("/home/francisco/Projects/agn/agn_processing/results/temporary_links/spectral_data/523_2_1xfe_6075_40_8.9e+21_8.9e+25_15_CONTINUUM_NONE.fluxdensity")
+
+x_fekalpha, y_fekalpha = x_y(
+    "/home/francisco/Projects/agn/agn_processing/results/temporary_links/spectral_data/523_2_1xfe_6075_40_8.9e+21_8.9e+25_15_FLUORESCENT_FeKalpha.fluxdensity")
 
 plt.plot(source_flux_density.x, source_flux_density.y)
-plt.plot(x, y)
+plt.plot(x, y+y_fekalpha)
+
+
 plt.xscale('log')
 plt.yscale('log')
 plt.show()

@@ -121,7 +121,31 @@ def build_continuum_spectra_map(grouped_spectra: Dict[SpectrumKind, SpectrumCoun
     return data_map
 
 
-def build_key_continuum_spectrum_flux_density_map(grouped_spectra: Dict[SpectrumKind, SpectrumCount], nh_distribution: ColumnDensityDistribution, source_spectrum: SpectrumCount, alpha_deg: AngularInterval) -> Dict[SpectrumKind, Tuple[SpectrumCount, FluxDensity]]:
+
+def build_fekalpha_spectra_map(grouped_spectra: Dict[SpectrumKind, SpectrumCount]) -> Dict[SpectrumKind, SpectrumCount]:
+
+    data_map: Dict[SpectrumKind, SpectrumCount] = {}
+
+    for spectrum_key in grouped_spectra:
+
+        if spectrum_key.line_label == 'FeKalpha':
+
+            continuum_spectrum_key = SpectrumKind(
+                grid_id=spectrum_key.grid_id, type_label='FLUORESCENT', line_label='FeKalpha')
+
+            if continuum_spectrum_key not in data_map:
+                data_map[continuum_spectrum_key] = grouped_spectra[spectrum_key]
+            else:
+                data_map[continuum_spectrum_key].y += grouped_spectra[spectrum_key].y
+                data_map[continuum_spectrum_key].y_err = data_map[continuum_spectrum_key].y**0.5
+
+    return data_map
+
+
+
+
+
+def build_key_spectrum_flux_density_map(grouped_spectra: Dict[SpectrumKind, SpectrumCount], nh_distribution: ColumnDensityDistribution, source_spectrum: SpectrumCount, alpha_deg: AngularInterval) -> Dict[SpectrumKind, Tuple[SpectrumCount, FluxDensity]]:
 
     data_map = {}
 
@@ -141,6 +165,7 @@ def build_key_continuum_spectrum_flux_density_map(grouped_spectra: Dict[Spectrum
             continue
 
     return data_map
+
 
 
 def get_nh_aver_label(sims_root_dir: str):
