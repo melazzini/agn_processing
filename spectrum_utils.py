@@ -481,7 +481,7 @@ def print_spectra(output_dir: str, spectra: Dict[str, SpectrumCount]):
 
     for spectrum_key in spectra:
         path_to_spectrum_file = os.path.join(
-            output_dir, f'{spectrum_key}.spectrum')
+            output_dir, f'{spectrum_key}')
 
         with open(path_to_spectrum_file, mode='w') as file:
 
