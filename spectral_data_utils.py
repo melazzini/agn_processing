@@ -11,6 +11,7 @@ import os
 import numpy as np
 from colum_density_utils import ColumnDensityGrid
 from agn_processing_policy import *
+from spectrum_utils import SpectrumCount
 
 
 def simulations_root_dir(nh_aver: float) -> str:
@@ -53,3 +54,37 @@ def get_spectra_directories(simulations: List[AgnSimulationInfo], alpha: Angular
 
     return spectra_dirs
 
+
+@dataclass
+class SpectrumKind:
+    grid_id: int
+    type_label: str
+    line_label: str
+
+    def __hash__(self):
+        return hash(self.__str__())
+
+    def build(spectrum_label: str):
+        g_str, t_str, l_str = spectrum_label.split(sep='_')
+        return SpectrumKind(grid_id=int(g_str), type_label=t_str, line_label=l_str)
+
+    def __str__(self) -> str:
+        return f'{self.grid_id}_{self.type_label}_{self.line_label}'
+
+
+def get_grouped_spectra_files(spectra_dirs: List[str]) -> Dict[SpectrumKind, List[str]]:
+
+    spectra: Dict[SpectrumKind, List[str]] = {}
+
+    for spectra_dir_i in spectra_dirs:
+        for spectrum_file in os.listdir(spectra_dir_i):
+            spectrum_kind = SpectrumKind.build(
+                spectrum_label=spectrum_file.split(sep='.')[0])
+
+            if spectrum_kind not in spectra:
+                spectra[spectrum_kind] = []
+
+            spectra[spectrum_kind] += [
+                os.path.join(spectra_dir_i, spectrum_file)]
+
+    return spectra

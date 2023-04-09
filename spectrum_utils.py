@@ -386,8 +386,9 @@ class SpectraBuilder:
 
     def __init__(self, sim_info: AgnSimulationInfo,
                  photon_registration_policy: PhotonRegistrationPolicy,
-                 hv_interval: EnergyInterval = EnergyInterval(100, 300_000),
-                 hv_n_intervals: int = 2000,
+                 hv_interval: EnergyInterval = EnergyInterval(
+                     HV_LEFT, HV_RIGHT),
+                 hv_n_intervals: int = HV_N_INTERVALS,
                  photon_units_policy: UnitsPolicy = AgnPhotonUnitsPolicy(),
                  ) -> None:
 
