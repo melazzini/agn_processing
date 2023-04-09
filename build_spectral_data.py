@@ -6,9 +6,13 @@ obtained from the simulations processed spectra.
 from utils import AngularInterval
 from paths_in_this_machine import root_simulations_directory
 from typing import Final, Dict, List
-from agn_utils import get_simulations_in_sims_root_dir, AgnSimulationInfo, get_total_n_photons, AGN_EFFECTIVE_LENGTHS_LABEL, AGN_NH_VIEWING_DIRECTIONS_DEG
+from agn_utils import *
+from colum_density_utils import build_nh_list_from_effective_lengths
 import os
 import numpy as np
+from colum_density_utils import get_all_effective_lengths, ColumnDensityDistribution, ColumnDensityGrid
+from agn_processing_policy import *
+import matplotlib.pyplot as plt
 
 
 nh_aver = 5e23
@@ -43,25 +47,11 @@ simulations = get_simulations_in_sims_root_dir(sims_root_dir=sims_root_dir,
 n_photons = get_total_n_photons(simulations=simulations)
 
 
-def get_direction_filepaths(simulations: List[AgnSimulationInfo], alpha: AngularInterval) -> List[str]:
-    direction_files = []
+all_effective_lengths = get_all_effective_lengths(
+    effective_lengths_filepaths=get_direction_filepaths(simulations=simulations, alpha=alpha))
 
-    for sim in simulations:
-        for viewing_angle_key in (x := sim.other_parameters[AGN_EFFECTIVE_LENGTHS_LABEL]):
-            if AGN_NH_VIEWING_DIRECTIONS_DEG[viewing_angle_key] == alpha:
-                direction_files += [x[viewing_angle_key]]
+nh_list_all = build_nh_list_from_effective_lengths(
+    effective_lengths=all_effective_lengths, sim_info=simulations[0])
 
-    return direction_files
-
-
-def get_directions(simulations: List[AgnSimulationInfo], alpha: AngularInterval) -> np.ndarray:
-
-    files = get_direction_filepaths(simulations=simulations, alpha=alpha)
-    directions = []
-    for file_i in files:
-        directions += list(np.loadtxt(file_i))
-
-    return np.array(directions)
-
-
-print(len(get_directions(simulations=simulations, alpha=alpha)), sep='\n')
+nh_distribution = ColumnDensityDistribution(nh_grid=ColumnDensityGrid(
+    left_nh=LEFT_NH, right_nh=RIGHT_NH, n_intervals=NH_INTERVALS), nh_list=nh_list_all)

@@ -279,3 +279,14 @@ def get_simulations_in_sims_root_dir(sims_root_dir: str, n_aver: int, a_fe: floa
 
 def get_total_n_photons(simulations: Iterable[AgnSimulationInfo]) -> float:
     return sum(s.n_photons for s in simulations)
+
+
+def get_direction_filepaths(simulations: List[AgnSimulationInfo], alpha: AngularInterval) -> List[str]:
+    direction_files = []
+
+    for sim in simulations:
+        for viewing_angle_key in (x := sim.other_parameters[AGN_EFFECTIVE_LENGTHS_LABEL]):
+            if AGN_NH_VIEWING_DIRECTIONS_DEG[viewing_angle_key] == alpha:
+                direction_files += [x[viewing_angle_key]]
+
+    return direction_files

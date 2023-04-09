@@ -35,10 +35,10 @@ print(*[f'{nh_i:>8.3g}: {nh_distribution.get_distribution_value_for_nh(nh_i):>8.
 
 
 from utils import *
-from agn_utils import AgnSimulationInfo
 import pint
 from agn_simulation_policy import AGN_SIMULATION_UNITS, AGN_PROCESSING_UNITS
 from agn_processing_policy import LEFT_NH, NH_INTERVALS, RIGHT_NH
+from agn_utils import AgnSimulationInfo
 
 
 class ColumnDensityInterval(Interval2D):
@@ -158,6 +158,14 @@ def _get_multiplication_factor_to_translate_from_sim_to_processing_units(dimensi
 def get_effective_lengths(path_to_effective_lengths_file: str) -> np.ndarray:
     data = np.loadtxt(path_to_effective_lengths_file)
     return data*_get_multiplication_factor_to_translate_from_sim_to_processing_units(dimensionality=LENGTH)
+
+
+def get_all_effective_lengths(effective_lengths_filepaths: List[str]) -> np.ndarray:
+    directions = []
+    for file_i in effective_lengths_filepaths:
+        directions += list(get_effective_lengths(path_to_effective_lengths_file=file_i))
+
+    return np.array(directions)
 
 
 def build_nh_list_from_effective_lengths(effective_lengths: np.ndarray, sim_info: AgnSimulationInfo) -> np.ndarray:
