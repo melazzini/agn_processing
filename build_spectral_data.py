@@ -8,12 +8,12 @@ from paths_in_this_machine import root_simulations_directory
 from typing import Final, Dict, List
 from agn_utils import get_simulations_in_sims_root_dir, AgnSimulationInfo, get_total_n_photons
 import os
-from functools import reduce
+import numpy as np
 
 
-nh_aver = 2e23
-n_aver = 4
-a_fe = 0.5
+nh_aver = 5e23
+n_aver = 2
+a_fe = 1
 alpha = AngularInterval(60, 15)
 
 
@@ -29,7 +29,7 @@ def simulations_root_dir(nh_aver: float) -> str:
 
     # TODO:
 
-    if nh_aver != 2e23:
+    if nh_aver != 5e23:
         raise ValueError('the nh_value is not valid at the moment!')
 
     return root_simulations_directory
@@ -41,3 +41,10 @@ simulations = get_simulations_in_sims_root_dir(sims_root_dir=sims_root_dir,
                                                n_aver=n_aver, a_fe=a_fe)
 
 n_photons = get_total_n_photons(simulations=simulations)
+
+
+def get_directions(simulations: List[AgnSimulationInfo]) -> np.array:
+    direction_files = []
+
+    for sim in simulations:
+        pass

@@ -17,7 +17,12 @@ _AGN_SIMULATION_LABEL_HINT = 'thread'
 AGN_SIMULATION_NAME_POL_IRON_ABUNDANCE_POS = 3
 AGN_IRON_ABUNDANCE_LABEL = 'a_fe'
 
-AGN_NH_DIRECTIONS_DIR_LABEL = 'nh_directions'
+AGN_NH_DIRECTIONS_DIR_LABEL = 'effective_lengths'
+
+
+def get_effective_lengths_directions_filename(angle_interval_label: str):
+    return f'{AGN_NH_DIRECTIONS_DIR_LABEL}_{angle_interval_label}'
+
 
 AGN_NH_VIEWING_DIRECTIONS_DEG: Final[Dict[str, AngularInterval]] = {
     "6075": AngularInterval(60, 15),
@@ -269,7 +274,3 @@ class AgnSimulationPolicy:
 
     def __translate_from_sim_to_processing_units(self, value, dimensionality: str):
         return (value*self.ureg[AGN_SIMULATION_UNITS[dimensionality]]).to(self.ureg[AGN_PROCESSING_UNITS[dimensionality]]).magnitude
-
-
-def get_nh_directions_file_name(angle_interval_label: str):
-    return f'nh_{angle_interval_label}'

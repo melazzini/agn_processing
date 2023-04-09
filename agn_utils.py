@@ -214,6 +214,8 @@ def get_iron_abundance_from_sim_name(simulation_name: str) -> float:
 
     return AGN_IRON_ABUNDANCE[code]
 
+# def get_angle_effective_lengths_map(directions_directory:)
+
 
 def get_simulations_in_sims_root_dir(sims_root_dir: str, n_aver: int, a_fe: float) -> List[AgnSimulationInfo]:
     """From a simulations root directory it returns the simulations that corresponds to the given
@@ -239,6 +241,16 @@ def get_simulations_in_sims_root_dir(sims_root_dir: str, n_aver: int, a_fe: floa
             continue
 
         sim_path = os.path.join(sims_root_dir, sim_name)
+
+        nh_directions_directory = os.path.join(
+            sim_path, AGN_NH_DIRECTIONS_DIR_LABEL)
+
+        if not os.path.exists(nh_directions_directory):
+            raise ValueError(
+                f'the effective lengths directory for {sim_path} doesn\'t exist!')
+
+        for nh_direction_file_i in os.listdir(nh_directions_directory):
+            print(os.path.join(nh_directions_directory, nh_direction_file_i))
 
         s = AgnSimulationInfo.build_agn_simulation_info(
             sim_path, lambda x: {AGN_IRON_ABUNDANCE_LABEL: get_iron_abundance_from_sim_name(simulation_name=sim_name)})

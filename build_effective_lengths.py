@@ -1,5 +1,5 @@
 from os import listdir, path, mkdir
-from agn_utils import AgnSimulationInfo, AGN_NH_DIRECTIONS_DIR_LABEL, AGN_NH_VIEWING_DIRECTIONS_DEG, get_nh_directions_file_name
+from agn_utils import AgnSimulationInfo, AGN_NH_DIRECTIONS_DIR_LABEL, AGN_NH_VIEWING_DIRECTIONS_DEG, get_effective_lengths_directions_filename
 import subprocess
 from paths_in_this_machine import root_simulations_directory, create_nh_distribution
 from functools import reduce
@@ -28,7 +28,7 @@ for sim_dir in listdir(root_dir):
 
     for alpha in AGN_NH_VIEWING_DIRECTIONS_DEG:
         outputfile = path.join(
-            directions_dir, get_nh_directions_file_name(alpha))
+            directions_dir, get_effective_lengths_directions_filename(alpha))
 
         rv = subprocess.call([create_nh_distribution,
                               str(sim_info.r_clouds/100),
