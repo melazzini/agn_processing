@@ -4,9 +4,10 @@ import subprocess
 from paths_in_this_machine import root_simulations_directory, create_nh_distribution
 from functools import reduce
 
-TOTAL_DIRECTIONS = 10_000
+TOTAL_DIRECTIONS = 1_000_000
 
 root_dir = root_simulations_directory
+root_dir = "/home/francisco/Projects/agn/agn_processing/results/temporary_links"
 
 print('=====================================')
 for sim_dir in listdir(root_dir):
@@ -24,7 +25,7 @@ for sim_dir in listdir(root_dir):
     if not path.exists(directions_dir):
         mkdir(directions_dir)
 
-    outputfile = path.join(directions_dir, 'nh_6075')
+    outputfile = path.join(directions_dir, 'nh_6090')
 
     rv = subprocess.call([create_nh_distribution,
                           str(sim_info.r_clouds/100),
@@ -33,25 +34,25 @@ for sim_dir in listdir(root_dir):
                           outputfile,
                           f'{TOTAL_DIRECTIONS}',
                           '60',
-                          '15'])
+                          '30'])
 
     if rv != 0:
         print(f'There was a problem with {sim_dir}')
         exit(-1)
 
-    outputfile = path.join(directions_dir, 'nh_7590')
+    # outputfile = path.join(directions_dir, 'nh_7590')
 
-    rv = subprocess.call([create_nh_distribution,
-                          str(sim_info.r_clouds/100),
-                          str(sim_info.n_clouds),
-                          sim_info.clouds_file_path,
-                          outputfile,
-                          f'{TOTAL_DIRECTIONS}',
-                          '75',
-                          '15'])
+    # rv = subprocess.call([create_nh_distribution,
+    #                       str(sim_info.r_clouds/100),
+    #                       str(sim_info.n_clouds),
+    #                       sim_info.clouds_file_path,
+    #                       outputfile,
+    #                       f'{TOTAL_DIRECTIONS}',
+    #                       '75',
+    #                       '15'])
 
-    if rv != 0:
-        print(f'There was a problem with {sim_dir}')
-        exit(-1)
+    # if rv != 0:
+    #     print(f'There was a problem with {sim_dir}')
+    #     exit(-1)
 
     print('=====================================')

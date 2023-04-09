@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import Final, List, Dict
 from os.path import isdir, isfile, join
 from dataclasses import dataclass
-from unit_convert import UnitConvert
 from math import radians
 import pint
 from os import listdir
@@ -77,7 +76,7 @@ def get_simulation_files_list(sim_root: str) -> List[str]:
         sim_root, _AGN_SIMULATION_DATA_DIR_PREFIX)
 
     files = [join(simulations_files_directory, sim_file) for sim_file in listdir(
-        simulations_files_directory) if _AGN_SIMULATION_LABEL_HINT in sim_file]
+        simulations_files_directory) if _AGN_SIMULATION_LABEL_HINT in sim_file and sim_file[-1:-4:-1]=='txt']
 
     return files
 
