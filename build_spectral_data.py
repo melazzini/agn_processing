@@ -43,6 +43,9 @@ simulations = get_simulations_in_sims_root_dir(sims_root_dir=sims_root_dir,
 n_photons = get_total_n_photons(simulations=simulations)
 
 
+print(*simulations, sep='\n\n\n')
+
+
 def get_directions(simulations: List[AgnSimulationInfo]) -> np.array:
     direction_files = []
 

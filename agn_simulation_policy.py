@@ -24,6 +24,10 @@ def get_effective_lengths_directions_filename(angle_interval_label: str):
     return f'{AGN_NH_DIRECTIONS_DIR_LABEL}_{angle_interval_label}'
 
 
+def get_effective_lengths_label_from_filename(effective_lengths_filename: str):
+    return effective_lengths_filename.split(sep='_')[-1]
+
+
 AGN_NH_VIEWING_DIRECTIONS_DEG: Final[Dict[str, AngularInterval]] = {
     "6075": AngularInterval(60, 15),
     "7590": AngularInterval(75, 15)

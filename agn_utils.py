@@ -5,7 +5,7 @@ import numpy as np
 from utils import *
 from paths_in_this_machine import AGN_SOURCE_DATA_STORAGE_DIR
 import os
-from typing import Iterable
+from typing import Iterable, Dict
 
 AGN_SOURCE_DATA_STORAGE_PREFIX: Final[str] = AGN_SOURCE_DATA_STORAGE_DIR
 
@@ -214,7 +214,23 @@ def get_iron_abundance_from_sim_name(simulation_name: str) -> float:
 
     return AGN_IRON_ABUNDANCE[code]
 
-# def get_angle_effective_lengths_map(directions_directory:)
+
+def get_angle_effective_lengths_map(effective_lengths_dir: str) -> Dict[str, str]:
+    """This returns the {angle_lbl->effective_lengths_filepath}
+
+    Args:
+        effective_lengths_dir (str): where to find the effective_lengths files
+
+    Returns:
+        Dict[str, str]: {angle_lbl->effective_lengths_filepath}
+    """
+
+    the_map = {}
+    for effective_lengths_filename_i in os.listdir(effective_lengths_dir):
+        the_map[get_effective_lengths_label_from_filename(
+            effective_lengths_filename=effective_lengths_filename_i)] = os.path.join(effective_lengths_dir, effective_lengths_filename_i)
+
+    return the_map
 
 
 def get_simulations_in_sims_root_dir(sims_root_dir: str, n_aver: int, a_fe: float) -> List[AgnSimulationInfo]:
@@ -242,18 +258,18 @@ def get_simulations_in_sims_root_dir(sims_root_dir: str, n_aver: int, a_fe: floa
 
         sim_path = os.path.join(sims_root_dir, sim_name)
 
-        nh_directions_directory = os.path.join(
+        effective_lengths_directory = os.path.join(
             sim_path, AGN_NH_DIRECTIONS_DIR_LABEL)
 
-        if not os.path.exists(nh_directions_directory):
+        if not os.path.exists(effective_lengths_directory):
             raise ValueError(
                 f'the effective lengths directory for {sim_path} doesn\'t exist!')
 
-        for nh_direction_file_i in os.listdir(nh_directions_directory):
-            print(os.path.join(nh_directions_directory, nh_direction_file_i))
+        effective_lengths_map = get_angle_effective_lengths_map(
+            effective_lengths_dir=effective_lengths_directory)
 
         s = AgnSimulationInfo.build_agn_simulation_info(
-            sim_path, lambda x: {AGN_IRON_ABUNDANCE_LABEL: get_iron_abundance_from_sim_name(simulation_name=sim_name)})
+            sim_path, lambda x: {AGN_IRON_ABUNDANCE_LABEL: get_iron_abundance_from_sim_name(simulation_name=sim_name), AGN_NH_DIRECTIONS_DIR_LABEL: effective_lengths_map})
 
         if s.other_parameters[AGN_IRON_ABUNDANCE_LABEL] == a_fe and s.n_aver == n_aver:
             simulations += [s]
