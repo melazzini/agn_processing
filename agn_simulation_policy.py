@@ -29,7 +29,7 @@ def get_effective_lengths_label_from_filename(effective_lengths_filename: str):
     return effective_lengths_filename.split(sep='_')[-1]
 
 
-AGN_NH_VIEWING_DIRECTIONS_DEG: Final[Dict[str, AngularInterval]] = {
+AGN_VIEWING_DIRECTIONS_DEG: Final[Dict[str, AngularInterval]] = {
     "6075": AngularInterval(60, 15),
     "7590": AngularInterval(75, 15)
 }

@@ -3,41 +3,14 @@ This module should build the spectral_data/ directories,
 from where we will extract the sum spectra and flux densities
 obtained from the simulations processed spectra.
 """
-from utils import AngularInterval
-from paths_in_this_machine import root_simulations_directory
-from typing import Final, Dict, List
-from agn_utils import *
-from colum_density_utils import build_nh_list_from_effective_lengths
-import os
-import numpy as np
-from colum_density_utils import get_all_effective_lengths, ColumnDensityDistribution, ColumnDensityGrid
-from agn_processing_policy import *
-import matplotlib.pyplot as plt
-
+from spectral_data_utils import *
+from colum_density_utils import get_all_effective_lengths, build_nh_list_from_effective_lengths, ColumnDensityDistribution
+from dataclasses import dataclass
 
 nh_aver = 5e23
 n_aver = 2
 a_fe = 1
 alpha = AngularInterval(60, 15)
-
-
-def simulations_root_dir(nh_aver: float) -> str:
-    """This function returns the root simulations directory for the given parameters.
-
-    Args:
-        nh_aver (float): average column density
-
-    Returns:
-        str: the path to the simulations root directory
-    """
-
-    # TODO:
-
-    if nh_aver != 5e23:
-        raise ValueError('the nh_value is not valid at the moment!')
-
-    return root_simulations_directory
-
 
 sims_root_dir = simulations_root_dir(nh_aver=nh_aver)
 
@@ -53,5 +26,21 @@ all_effective_lengths = get_all_effective_lengths(
 nh_list_all = build_nh_list_from_effective_lengths(
     effective_lengths=all_effective_lengths, sim_info=simulations[0])
 
-nh_distribution = ColumnDensityDistribution(nh_grid=ColumnDensityGrid(
-    left_nh=LEFT_NH, right_nh=RIGHT_NH, n_intervals=NH_INTERVALS), nh_list=nh_list_all)
+nh_grid = ColumnDensityGrid(
+    left_nh=LEFT_NH, right_nh=RIGHT_NH, n_intervals=NH_INTERVALS)
+nh_distribution = ColumnDensityDistribution(
+    nh_grid=nh_grid, nh_list=nh_list_all)
+
+spectra_dirs = get_spectra_directories(
+    simulations=simulations, alpha=alpha, grid=nh_grid)
+
+
+@dataclass
+class SpectrumKind:
+    grid_id: int
+    type_label: str
+    line_label: str
+
+
+
+def get_grouped_spectra(spectra_dirs:List[str],)

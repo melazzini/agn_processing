@@ -286,7 +286,7 @@ def get_direction_filepaths(simulations: List[AgnSimulationInfo], alpha: Angular
 
     for sim in simulations:
         for viewing_angle_key in (x := sim.other_parameters[AGN_EFFECTIVE_LENGTHS_LABEL]):
-            if AGN_NH_VIEWING_DIRECTIONS_DEG[viewing_angle_key] == alpha:
+            if AGN_VIEWING_DIRECTIONS_DEG[viewing_angle_key] == alpha:
                 direction_files += [x[viewing_angle_key]]
 
     return direction_files

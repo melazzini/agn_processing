@@ -13,7 +13,7 @@ The resulting spectra will be stored in
 
 from spectrum_utils import *
 from colum_density_utils import *
-from agn_utils import AgnSimulationInfo, translate_zenit
+from agn_utils import AgnSimulationInfo, translate_zenit, AGN_VIEWING_DIRECTIONS_DEG
 from math import radians
 import matplotlib.pyplot as plt
 from flux_density_utils import *
@@ -41,18 +41,14 @@ for sim_dir_name in os.listdir(root_dir):
     builder = SpectraBuilder(sim_info=sim_info,
                              photon_registration_policy=reg_policy)
 
-    spectra = builder.build(translate_zenit(AngularInterval(
-        beg=radians(60), length=radians(15))))
+    for alpha_label in AGN_VIEWING_DIRECTIONS_DEG:
 
-    print_spectra(output_dir=os.path.join(sim_info.sim_root_dir,
-                                          f'THETA_6075_nh_grid_{reg_policy.grid.n_intervals}_{reg_policy.grid.left:0.1g}_{reg_policy.grid.right:0.1g}'),
-                  spectra=spectra)
+        alpha = AGN_VIEWING_DIRECTIONS_DEG[alpha_label]
 
-    spectra = builder.build(translate_zenit(AngularInterval(
-        beg=radians(75), length=radians(15))))
+        spectra = builder.build(translate_zenit(alpha.from_deg_to_rad()))
 
-    print_spectra(output_dir=os.path.join(sim_info.sim_root_dir,
-                                          f'THETA_7590_nh_grid_{reg_policy.grid.n_intervals}_{reg_policy.grid.left:0.1g}_{reg_policy.grid.right:0.1g}'),
-                  spectra=spectra)
+        print_spectra(output_dir=os.path.join(sim_info.sim_root_dir,
+                                              f'THETA_{alpha_label}_nh_grid_{reg_policy.grid.n_intervals}_{reg_policy.grid.left:0.2g}_{reg_policy.grid.right:0.2g}'),
+                      spectra=spectra)
 
     print("============================================")

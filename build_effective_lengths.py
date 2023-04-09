@@ -1,5 +1,5 @@
 from os import listdir, path, mkdir
-from agn_utils import AgnSimulationInfo, AGN_EFFECTIVE_LENGTHS_DIR_LABEL, AGN_NH_VIEWING_DIRECTIONS_DEG, get_effective_lengths_directions_filename
+from agn_utils import AgnSimulationInfo, AGN_EFFECTIVE_LENGTHS_DIR_LABEL, AGN_VIEWING_DIRECTIONS_DEG, get_effective_lengths_directions_filename
 import subprocess
 from paths_in_this_machine import root_simulations_directory, create_nh_distribution
 from functools import reduce
@@ -26,7 +26,7 @@ for sim_dir in listdir(root_dir):
     if not path.exists(directions_dir):
         mkdir(directions_dir)
 
-    for alpha in AGN_NH_VIEWING_DIRECTIONS_DEG:
+    for alpha in AGN_VIEWING_DIRECTIONS_DEG:
         outputfile = path.join(
             directions_dir, get_effective_lengths_directions_filename(alpha))
 
@@ -36,8 +36,8 @@ for sim_dir in listdir(root_dir):
                               sim_info.clouds_file_path,
                               outputfile,
                               f'{TOTAL_DIRECTIONS}',
-                              f'{AGN_NH_VIEWING_DIRECTIONS_DEG[alpha].beg}',
-                              f'{AGN_NH_VIEWING_DIRECTIONS_DEG[alpha].end}'])
+                              f'{AGN_VIEWING_DIRECTIONS_DEG[alpha].beg}',
+                              f'{AGN_VIEWING_DIRECTIONS_DEG[alpha].end}'])
 
         if rv != 0:
             print(f'There was a problem with {sim_dir}')
