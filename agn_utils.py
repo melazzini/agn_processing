@@ -5,7 +5,7 @@ import numpy as np
 from utils import *
 from paths_in_this_machine import AGN_SOURCE_DATA_STORAGE_DIR
 import os
-
+from typing import Iterable
 
 AGN_SOURCE_DATA_STORAGE_PREFIX: Final[str] = AGN_SOURCE_DATA_STORAGE_DIR
 
@@ -247,3 +247,7 @@ def get_simulations_in_sims_root_dir(sims_root_dir: str, n_aver: int, a_fe: floa
             simulations += [s]
 
     return simulations
+
+
+def get_total_n_photons(simulations: Iterable[AgnSimulationInfo]) -> float:
+    return sum(s.n_photons for s in simulations)
