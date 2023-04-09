@@ -1,5 +1,5 @@
 from os import listdir, path, mkdir
-from agn_utils import AgnSimulationInfo, AGN_NH_DIRECTIONS_DIR_LABEL, AGN_NH_VIEWING_DIRECTIONS_DEG, get_effective_lengths_directions_filename
+from agn_utils import AgnSimulationInfo, AGN_EFFECTIVE_LENGTHS_DIR_LABEL, AGN_NH_VIEWING_DIRECTIONS_DEG, get_effective_lengths_directions_filename
 import subprocess
 from paths_in_this_machine import root_simulations_directory, create_nh_distribution
 from functools import reduce
@@ -21,7 +21,7 @@ for sim_dir in listdir(root_dir):
         sim_root_dir=sim_root_dir)
     print(sim_info)
 
-    directions_dir = path.join(sim_root_dir, AGN_NH_DIRECTIONS_DIR_LABEL)
+    directions_dir = path.join(sim_root_dir, AGN_EFFECTIVE_LENGTHS_DIR_LABEL)
 
     if not path.exists(directions_dir):
         mkdir(directions_dir)

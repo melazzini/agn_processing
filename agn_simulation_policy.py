@@ -17,11 +17,12 @@ _AGN_SIMULATION_LABEL_HINT = 'thread'
 AGN_SIMULATION_NAME_POL_IRON_ABUNDANCE_POS = 3
 AGN_IRON_ABUNDANCE_LABEL = 'a_fe'
 
-AGN_NH_DIRECTIONS_DIR_LABEL = 'effective_lengths'
+AGN_EFFECTIVE_LENGTHS_DIR_LABEL = 'effective_lengths'
+AGN_EFFECTIVE_LENGTHS_LABEL = AGN_EFFECTIVE_LENGTHS_DIR_LABEL
 
 
 def get_effective_lengths_directions_filename(angle_interval_label: str):
-    return f'{AGN_NH_DIRECTIONS_DIR_LABEL}_{angle_interval_label}'
+    return f'{AGN_EFFECTIVE_LENGTHS_DIR_LABEL}_{angle_interval_label}'
 
 
 def get_effective_lengths_label_from_filename(effective_lengths_filename: str):

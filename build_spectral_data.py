@@ -6,7 +6,7 @@ obtained from the simulations processed spectra.
 from utils import AngularInterval
 from paths_in_this_machine import root_simulations_directory
 from typing import Final, Dict, List
-from agn_utils import get_simulations_in_sims_root_dir, AgnSimulationInfo, get_total_n_photons
+from agn_utils import get_simulations_in_sims_root_dir, AgnSimulationInfo, get_total_n_photons, AGN_EFFECTIVE_LENGTHS_LABEL, AGN_NH_VIEWING_DIRECTIONS_DEG
 import os
 import numpy as np
 
@@ -43,11 +43,25 @@ simulations = get_simulations_in_sims_root_dir(sims_root_dir=sims_root_dir,
 n_photons = get_total_n_photons(simulations=simulations)
 
 
-print(*simulations, sep='\n\n\n')
-
-
-def get_directions(simulations: List[AgnSimulationInfo]) -> np.array:
+def get_direction_filepaths(simulations: List[AgnSimulationInfo], alpha: AngularInterval) -> List[str]:
     direction_files = []
 
     for sim in simulations:
-        pass
+        for viewing_angle_key in (x := sim.other_parameters[AGN_EFFECTIVE_LENGTHS_LABEL]):
+            if AGN_NH_VIEWING_DIRECTIONS_DEG[viewing_angle_key] == alpha:
+                direction_files += [x[viewing_angle_key]]
+
+    return direction_files
+
+
+def get_directions(simulations: List[AgnSimulationInfo], alpha: AngularInterval) -> np.ndarray:
+
+    files = get_direction_filepaths(simulations=simulations, alpha=alpha)
+    directions = []
+    for file_i in files:
+        directions += list(np.loadtxt(file_i))
+
+    return np.array(directions)
+
+
+print(len(get_directions(simulations=simulations, alpha=alpha)), sep='\n')

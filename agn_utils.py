@@ -259,7 +259,7 @@ def get_simulations_in_sims_root_dir(sims_root_dir: str, n_aver: int, a_fe: floa
         sim_path = os.path.join(sims_root_dir, sim_name)
 
         effective_lengths_directory = os.path.join(
-            sim_path, AGN_NH_DIRECTIONS_DIR_LABEL)
+            sim_path, AGN_EFFECTIVE_LENGTHS_DIR_LABEL)
 
         if not os.path.exists(effective_lengths_directory):
             raise ValueError(
@@ -269,7 +269,7 @@ def get_simulations_in_sims_root_dir(sims_root_dir: str, n_aver: int, a_fe: floa
             effective_lengths_dir=effective_lengths_directory)
 
         s = AgnSimulationInfo.build_agn_simulation_info(
-            sim_path, lambda x: {AGN_IRON_ABUNDANCE_LABEL: get_iron_abundance_from_sim_name(simulation_name=sim_name), AGN_NH_DIRECTIONS_DIR_LABEL: effective_lengths_map})
+            sim_path, lambda x: {AGN_IRON_ABUNDANCE_LABEL: get_iron_abundance_from_sim_name(simulation_name=sim_name), AGN_EFFECTIVE_LENGTHS_LABEL: effective_lengths_map})
 
         if s.other_parameters[AGN_IRON_ABUNDANCE_LABEL] == a_fe and s.n_aver == n_aver:
             simulations += [s]
