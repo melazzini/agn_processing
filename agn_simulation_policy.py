@@ -76,13 +76,13 @@ def get_simulation_files_list(sim_root: str) -> List[str]:
         sim_root, _AGN_SIMULATION_DATA_DIR_PREFIX)
 
     files = [join(simulations_files_directory, sim_file) for sim_file in listdir(
-        simulations_files_directory) if _AGN_SIMULATION_LABEL_HINT in sim_file and sim_file[-1:-4:-1]=='txt']
+        simulations_files_directory) if _AGN_SIMULATION_LABEL_HINT in sim_file and sim_file[-1:-4:-1] == 'txt']
 
     return files
 
 
 @dataclass
-class _AgnInfoRaw:
+class AgnInfoRaw:
     r1: float
     """Internal torus radius.
     """
@@ -190,8 +190,11 @@ class AgnSimulationPolicy:
     def get_temperature_electrons(self):
         return self.__translate_from_sim_to_processing_units(value=self._info_raw.temperature_e, dimensionality=TEMPERATURE)
 
-    def get_other_extra_parameters(self):
-        return self._info_raw.other_parameters
+    def get_other_extra_parameters(self, f: any = None):
+        if f:
+            return f(self._info_raw)
+        else:
+            return self._info_raw.other_parameters
 
     def __get_info_raw(self, info_file: str):
         info_dict_raw = self.__get_info_dict_raw(info_file)
@@ -221,7 +224,7 @@ class AgnSimulationPolicy:
         temperature_e = float(
             info_dict_raw[_AGN_SIMULATION_INFO_FILE_ELECTRONS_TEMPERATURE_KEY])
         other_parameters = []
-        return _AgnInfoRaw(
+        return AgnInfoRaw(
             r1=r1,
             r2=r2,
             theta=theta,

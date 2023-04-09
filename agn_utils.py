@@ -134,7 +134,7 @@ class AgnSimulationInfo:
         return sim_metadata + reduce(lambda x, y: x+y, files)
 
     @staticmethod
-    def build_agn_simulation_info(sim_root_dir: str) -> AgnSimulationInfo:
+    def build_agn_simulation_info(sim_root_dir: str, f: any = None) -> AgnSimulationInfo:
         """This factory method builds an AgnSimulationInfo obj.
 
         Args:
@@ -160,7 +160,7 @@ class AgnSimulationInfo:
             n_clouds=policy.get_n_clouds(),
             r_clouds=policy.get_r_clouds(),
             temperature_e=policy.get_temperature_electrons(),
-            other_parameters=policy.get_other_extra_parameters(),
+            other_parameters=policy.get_other_extra_parameters(f=f),
             simulation_files=get_simulation_files_list(sim_root_dir),
             is_smooth=is_smooth
         )
