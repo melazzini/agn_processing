@@ -35,7 +35,7 @@ def simulations_root_dir(nh_aver: float) -> str:
 
     # TODO:
 
-    if nh_aver != 5e23:
+    if nh_aver != 2e23:
         raise ValueError('the nh_value is not valid at the moment!')
 
     return root_simulations_directory

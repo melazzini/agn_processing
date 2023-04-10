@@ -20,35 +20,43 @@ from flux_density_utils import *
 from paths_in_this_machine import *
 from paths_in_this_machine import root_simulations_directory
 
-root_dir = root_simulations_directory
+# root_dir = root_simulations_directory
 
-print("============================================")
-for sim_dir_name in os.listdir(root_dir):
-
-    sim_dir = os.path.join(root_dir, sim_dir_name)
-
-    if sim_dir_name == 'past' or os.path.isfile(sim_dir) or 'data' not in os.listdir(sim_dir):
-        print(f'Unknown directory name: {sim_dir}')
-        continue
-
-    sim_info = AgnSimulationInfo.build_agn_simulation_info(
-        sim_root_dir=sim_dir)
-
-    print(sim_info)
-
-    reg_policy = NHPhotonRegistrationPolicy(simulation_info=sim_info)
-
-    builder = SpectraBuilder(sim_info=sim_info,
-                             photon_registration_policy=reg_policy)
-
-    for alpha_label in AGN_VIEWING_DIRECTIONS_DEG:
-
-        alpha = AGN_VIEWING_DIRECTIONS_DEG[alpha_label]
-
-        spectra = builder.build(translate_zenit(alpha.from_deg_to_rad()))
-
-        print_spectra(output_dir=os.path.join(sim_info.sim_root_dir,
-                                              f'THETA_{alpha_label}_nh_grid_{reg_policy.grid.n_intervals}_{reg_policy.grid.left:0.2g}_{reg_policy.grid.right:0.2g}'),
-                      spectra=spectra)
+for root_dir in ["/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_223", "/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_23", "/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_523"]:
 
     print("============================================")
+
+    for sim_dir_name in os.listdir(root_dir):
+
+        sim_dir = os.path.join(root_dir, sim_dir_name)
+
+        if sim_dir_name == 'past' or os.path.isfile(sim_dir) or 'data' not in os.listdir(sim_dir):
+            print(f'Unknown directory name: {sim_dir}')
+            continue
+
+        sim_info = AgnSimulationInfo.build_agn_simulation_info(
+            sim_root_dir=sim_dir)
+
+        print(sim_info)
+
+        reg_policy = NHPhotonRegistrationPolicy(simulation_info=sim_info)
+
+        builder = SpectraBuilder(sim_info=sim_info,
+                                 photon_registration_policy=reg_policy)
+
+        for alpha_label in AGN_VIEWING_DIRECTIONS_DEG:
+
+            output_dir = os.path.join(sim_info.sim_root_dir,
+                                      f'THETA_{alpha_label}_nh_grid_{reg_policy.grid.n_intervals}_{reg_policy.grid.left:0.2g}_{reg_policy.grid.right:0.2g}')
+
+            if os.path.exists(output_dir):
+                continue
+
+            alpha = AGN_VIEWING_DIRECTIONS_DEG[alpha_label]
+
+            spectra = builder.build(translate_zenit(alpha.from_deg_to_rad()))
+
+            print_spectra(output_dir=output_dir,
+                          spectra=spectra)
+
+        print("============================================")

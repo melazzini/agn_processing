@@ -10,7 +10,7 @@ from spectrum_utils import SpectrumCount, PoissonSpectrumCountFactory, generate_
 from flux_density_utils import FluxDensityBuilder, FULL_TORUS_ANGLE_DEG
 import matplotlib.pyplot as plt
 
-nh_aver = 5e23
+nh_aver = 2e23
 n_aver = 2
 a_fe = 1
 alpha = AngularInterval(60, 15)
@@ -115,15 +115,3 @@ for kind in data_map:
 
     print_spectra(spectral_data_dir, {label+'.fluxdensity': data_map[kind][1]})
 
-x, y = x_y("/home/francisco/Projects/agn/agn_processing/results/temporary_links/spectral_data/523_2_1xfe_6075_40_8.9e+21_8.9e+25_15_CONTINUUM_NONE.fluxdensity")
-
-x_fekalpha, y_fekalpha = x_y(
-    "/home/francisco/Projects/agn/agn_processing/results/temporary_links/spectral_data/523_2_1xfe_6075_40_8.9e+21_8.9e+25_15_FLUORESCENT_FeKalpha.fluxdensity")
-
-plt.plot(source_flux_density.x, source_flux_density.y)
-plt.plot(x, y+y_fekalpha)
-
-
-plt.xscale('log')
-plt.yscale('log')
-plt.show()
