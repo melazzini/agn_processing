@@ -202,7 +202,9 @@ class AgnSimulationPolicy:
     def get_average_column_density(self) -> float:
         return self.__translate_from_sim_to_processing_units(value=self._info_raw.nh_aver, dimensionality=N_H_DIM)
 
-    def get_aver_n_clouds(self):
+    def get_aver_n_clouds(self, smooth: bool = None):
+        if smooth:
+            return -1
         return self._info_raw.n_aver
 
     def get_volume_filling_factor(self):

@@ -4,14 +4,14 @@ from where we will extract the sum spectra and flux densities
 obtained from the simulations processed spectra.
 """
 from utils import AngularInterval
-from paths_in_this_machine import root_simulations_directory
+from paths_in_this_machine import repo_directory
 from typing import Final, Dict, List
 from agn_utils import *
 import os
 import numpy as np
 from colum_density_utils import ColumnDensityGrid, ColumnDensityDistribution
 from agn_processing_policy import *
-from spectrum_utils import SpectrumCount
+from spectrum_utils import SpectrumCount, PoissonSpectrumCountFactory
 from flux_density_utils import FluxDensityBuilder, FluxDensity
 
 
@@ -23,6 +23,7 @@ IRON_ABUNDANCES = {
     2: '2xfe',
 }
 
+
 def simulations_root_dir(nh_aver: float) -> str:
     """This function returns the root simulations directory for the given parameters.
 
@@ -33,12 +34,15 @@ def simulations_root_dir(nh_aver: float) -> str:
         str: the path to the simulations root directory
     """
 
-    # TODO:
-
-    if nh_aver != 2e23:
-        raise ValueError('the nh_value is not valid at the moment!')
-
-    return root_simulations_directory
+    if nh_aver == 1e23:
+        return os.path.join(repo_directory, 'N_H_23')
+    elif nh_aver == 2e23:
+        return os.path.join(repo_directory, 'N_H_223')
+    elif nh_aver == 5e23:
+        return os.path.join(repo_directory, 'N_H_523')
+    else:
+        raise ValueError(
+            f'The simulation directory for nh={nh_aver} cannot be determined!')
 
 
 def get_spectra_directory_name(alpha: AngularInterval, grid: ColumnDensityGrid) -> str:
@@ -121,6 +125,49 @@ def build_continuum_spectra_map(grouped_spectra: Dict[SpectrumKind, SpectrumCoun
     return data_map
 
 
+def build_transmitted_spectra_map(grouped_spectra: Dict[SpectrumKind, SpectrumCount]) -> Dict[SpectrumKind, SpectrumCount]:
+
+    data_map: Dict[SpectrumKind, SpectrumCount] = {}
+
+    for spectrum_key in grouped_spectra:
+
+        if spectrum_key.type_label in ('NOINTERACTION', 'SOURCE'):
+
+            continuum_spectrum_key = SpectrumKind(
+                grid_id=None, type_label='TRANSMITTED', line_label='NONE')
+
+            continuum_spectrum_key.grid_id = spectrum_key.grid_id
+
+            if continuum_spectrum_key not in data_map:
+                data_map[continuum_spectrum_key] = grouped_spectra[spectrum_key]
+            else:
+                data_map[continuum_spectrum_key].y += grouped_spectra[spectrum_key].y
+                data_map[continuum_spectrum_key].y_err = data_map[continuum_spectrum_key].y**0.5
+
+    return data_map
+
+
+def build_compton_spectra_map(grouped_spectra: Dict[SpectrumKind, SpectrumCount]) -> Dict[SpectrumKind, SpectrumCount]:
+
+    data_map: Dict[SpectrumKind, SpectrumCount] = {}
+
+    for spectrum_key in grouped_spectra:
+
+        if spectrum_key.type_label in ('SCATTERING'):
+
+            continuum_spectrum_key = SpectrumKind(
+                grid_id=None, type_label='COMPTON', line_label='NONE')
+
+            continuum_spectrum_key.grid_id = spectrum_key.grid_id
+
+            if continuum_spectrum_key not in data_map:
+                data_map[continuum_spectrum_key] = grouped_spectra[spectrum_key]
+            else:
+                data_map[continuum_spectrum_key].y += grouped_spectra[spectrum_key].y
+                data_map[continuum_spectrum_key].y_err = data_map[continuum_spectrum_key].y**0.5
+
+    return data_map
+
 
 def build_fekalpha_spectra_map(grouped_spectra: Dict[SpectrumKind, SpectrumCount]) -> Dict[SpectrumKind, SpectrumCount]:
 
@@ -140,9 +187,6 @@ def build_fekalpha_spectra_map(grouped_spectra: Dict[SpectrumKind, SpectrumCount
                 data_map[continuum_spectrum_key].y_err = data_map[continuum_spectrum_key].y**0.5
 
     return data_map
-
-
-
 
 
 def build_key_spectrum_flux_density_map(grouped_spectra: Dict[SpectrumKind, SpectrumCount], nh_distribution: ColumnDensityDistribution, source_spectrum: SpectrumCount, alpha_deg: AngularInterval) -> Dict[SpectrumKind, Tuple[SpectrumCount, FluxDensity]]:
@@ -167,7 +211,11 @@ def build_key_spectrum_flux_density_map(grouped_spectra: Dict[SpectrumKind, Spec
     return data_map
 
 
-
 def get_nh_aver_label(sims_root_dir: str):
-    # return sims_root_dir.split(sep='/')[-1].split(sep='_')[2]
-    return "523"
+    return sims_root_dir.split(sep='/')[-1].split(sep='_')[2]
+
+
+def group_spectra(grouped_spectra_files: Dict[SpectrumKind, List[str]]) -> Dict[SpectrumKind, SpectrumCount]:
+
+    return {
+        k: PoissonSpectrumCountFactory.build_spectrum_count(*grouped_spectra_files[k]) for k in grouped_spectra_files}

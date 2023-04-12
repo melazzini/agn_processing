@@ -1,8 +1,9 @@
 from os import listdir, path, mkdir, path
 from agn_utils import AgnSimulationInfo, AGN_EFFECTIVE_LENGTHS_DIR_LABEL, AGN_VIEWING_DIRECTIONS_DEG, get_effective_lengths_directions_filename
-import subprocess
+from photon_register_policy import PhotonRawInfo
 from paths_in_this_machine import root_simulations_directory, create_nh_distribution
 from functools import reduce
+from numpy import pi
 
 TOTAL_DIRECTIONS = 1_000_000
 
@@ -21,6 +22,7 @@ for root_dir in ["/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build
             sim_root_dir=sim_root_dir)
 
         print(sim_info)
+        print('====================================')
 
         directions_dir = path.join(
             sim_root_dir, AGN_EFFECTIVE_LENGTHS_DIR_LABEL)
@@ -32,19 +34,25 @@ for root_dir in ["/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build
             outputfile = path.join(
                 directions_dir, get_effective_lengths_directions_filename(alpha))
 
-            rv = subprocess.call([create_nh_distribution,
-                                  str(sim_info.r_clouds/100),
-                                  str(sim_info.n_clouds),
-                                  str(sim_info.r1/100),
-                                  str(sim_info.r2/100),
-                                  outputfile,
-                                  f'{TOTAL_DIRECTIONS}',
-                                  f'{AGN_VIEWING_DIRECTIONS_DEG[alpha].beg}',
-                                  f'{AGN_VIEWING_DIRECTIONS_DEG[alpha].length}',
-                                  sim_info.clouds_file_path])
+            alpha_rad = AGN_VIEWING_DIRECTIONS_DEG[alpha].from_deg_to_rad()
 
-            if rv != 0:
-                print(f'There was a problem with {sim_dir}')
-                exit(-1)
+            min_phi = pi/2 - alpha_rad.end
+            max_phi = pi/2 - alpha_rad.beg
 
+            with open(outputfile, 'w') as directions_file:
+                for sim_file_path in sim_info.simulation_files:
+                    with open(sim_file_path) as sim_file:
+                        counter = 0
+                        for line in sim_file:
+                            photon_info = PhotonRawInfo.build_photon_raw_info(
+                                raw_info=line)
+
+                            if min_phi <= photon_info.phi <= max_phi:
+                                directions_file.write(
+                                    f'{photon_info.effective_length}\n')
+
+                            counter += 1
+                            if counter % 10000 == 0:
+                                print(
+                                    f'number of photons from file{sim_file_path}: {counter}')
         print('=====================================')

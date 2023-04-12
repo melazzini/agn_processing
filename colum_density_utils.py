@@ -183,6 +183,7 @@ class ColumnDensityDistribution:
     def __init__(self, nh_grid: ColumnDensityGrid, nh_list: np.ndarray):
         self.grid = nh_grid
         self._histogram = Histo(bins=np.array(self.grid.nh_list), counts=np.zeros(
+            self.grid.n_intervals), counts_err=np.zeros(
             self.grid.n_intervals), raw_data=nh_list)
         self._build_histogram(histogram=self._histogram)
 
@@ -191,8 +192,22 @@ class ColumnDensityDistribution:
             if self.grid.left <= nh_i <= self.grid.right:
                 index = self.grid.index(nh_i)
                 histogram.counts[index] += 1
+                histogram.counts_err[index] = histogram.counts[index]**0.5
+            elif nh_i < self.grid.left:
+                index = 0
+                histogram.counts[index] += 1
+                histogram.counts_err[index] = histogram.counts[index]**0.5
+            elif self.grid.right < nh_i:
+                index = -1
+                histogram.counts[index] += 1
+                histogram.counts_err[index] = histogram.counts[index]**0.5
 
-        histogram.counts /= sum(histogram.counts)
+        total_count = sum(histogram.counts)
+        histogram.counts /= total_count
+        histogram.counts_err /= total_count
 
     def get_distribution_value_for_nh(self, nh: float) -> float:
         return self._histogram.counts[self.grid.index(nh=nh)]
+
+    def get_distribution_value_err_for_nh(self, nh: float) -> float:
+        return self._histogram.counts_err[self.grid.index(nh=nh)]

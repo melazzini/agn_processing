@@ -230,6 +230,7 @@ class Histo:
     """
     bins: np.ndarray
     counts: np.ndarray
+    counts_err: np.ndarray
     raw_data: np.ndarray
 
     def mean(self)->float:

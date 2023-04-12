@@ -4,7 +4,6 @@ import subprocess
 from paths_in_this_machine import root_simulations_directory, update_effective_length_6_columns
 
 root_dir = root_simulations_directory
-update_effective_length_6_columns = update_effective_length_6_columns
 
 print('=====================================')
 for sim_dir in listdir(root_dir):

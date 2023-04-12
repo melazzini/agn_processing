@@ -155,7 +155,7 @@ class AgnSimulationInfo:
             r2=policy.get_external_radius(),
             theta=policy.get_half_opening_angle(),
             nh_aver=policy.get_average_column_density(),
-            n_aver=policy.get_aver_n_clouds(),
+            n_aver=policy.get_aver_n_clouds(smooth=is_smooth),
             phi=policy.get_volume_filling_factor(),
             n_photons=policy.get_n_photons(),
             n_clouds=policy.get_n_clouds(),
@@ -253,7 +253,7 @@ def get_simulations_in_sims_root_dir(sims_root_dir: str, n_aver: int, a_fe: floa
 
     for sim_name in os.listdir(sims_root_dir):
 
-        if "spectral_data" == sim_name or "past" == sim_name:
+        if "spectral_data" == sim_name or "past" == sim_name or 'data' not in listdir(os.path.join(sims_root_dir, sim_name)):
             continue
 
         sim_path = os.path.join(sims_root_dir, sim_name)
