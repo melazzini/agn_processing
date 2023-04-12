@@ -4,7 +4,7 @@ from photon_register_policy import PhotonRawInfo
 from paths_in_this_machine import root_simulations_directory, create_nh_distribution
 from functools import reduce
 from numpy import pi
-
+ 
 TOTAL_DIRECTIONS = 1_000_000
   
 root_dir = root_simulations_directory
