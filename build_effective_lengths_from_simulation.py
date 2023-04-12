@@ -6,9 +6,9 @@ from functools import reduce
 from numpy import pi
 
 TOTAL_DIRECTIONS = 1_000_000
-
+  
 root_dir = root_simulations_directory
-
+  
 # for root_dir in ["/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_223", "/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_23", "/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_523"]:
 for root_dir in ["/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_223"]:
     print('=====================================')
