@@ -119,8 +119,8 @@ class SpectrumBase:
     #     """
     #     return self.x, self.y, self.y_err
 
-    # def algebraic_area(self):
-    #     return np.trapz(x=self.x, y=self.y)
+    def algebraic_area(self):
+        return np.trapz(x=self.x, y=self.y)
 
     # def algebraic_area_err(self):
     #     return np.sqrt(np.trapz(x=self.x, y=self.y_err**2))
@@ -190,31 +190,31 @@ class SpectrumBase:
 
         return SpectrumBase(np.array(new_x), np.array(new_y), np.array(new_y_err))
 
-    # def average_y(self, energy_interval: EnergyInterval) -> float:
-    #     subspectrum = self.get_cpy_on_interval(energy_interval)
-    #     return np.sum(subspectrum.y)/len(subspectrum.y)
+    def average_y(self, energy_interval: EnergyInterval) -> float:
+        subspectrum = self.get_cpy_on_interval(energy_interval)
+        return np.sum(subspectrum.y)/len(subspectrum.y)
 
-    # def average(self, energy_interval: EnergyInterval = None) -> Tuple[ValueAndError, float]:
+    def average(self, energy_interval: EnergyInterval = None) -> ValueAndError:
 
-    #     if energy_interval == None:
-    #         energy_interval = EnergyInterval(self.x[0], self.x[-1])
+        if energy_interval == None:
+            energy_interval = EnergyInterval(self.x[0], self.x[-1])
 
-    #     subspectrum = self.get_cpy_on_interval(energy_interval)
+        subspectrum = self.get_cpy_on_interval(energy_interval)
 
-    #     aver_x = np.sum(subspectrum.x)/len(subspectrum.x)
-    #     index = get_interval_index_log(aver_x, Interval2D(
-    #         energy_interval.left, energy_interval.right), len(subspectrum.x))
-    #     aver_y = np.sum(subspectrum.y)/len(subspectrum.y)
-    #     aver_y_err = np.sqrt(np.sum(subspectrum.y_err**2)) / \
-    #         len(subspectrum.y_err)
+        aver_x = np.sum(subspectrum.x)/len(subspectrum.x)
+        index = get_interval_index_log(aver_x, Interval2D(
+            energy_interval.left, energy_interval.right), len(subspectrum.x))
+        aver_y = np.sum(subspectrum.y)/len(subspectrum.y)
+        aver_y_err = np.sqrt(np.sum(subspectrum.y_err**2)) / \
+            len(subspectrum.y_err)
 
-    #     return ValueAndError(value=aver_y, err=aver_y_err), subspectrum.x[index]
+        return ValueAndError(value=aver_y, err=aver_y_err)
 
     # def std_y(self, energy_interval: EnergyInterval) -> float:
     #     return np.std(self.get_cpy_on_interval(energy_interval).y)
 
-    # def x_interval(self):
-    #     return self.x[0], self.x[-1]
+    def x_interval(self):
+        return self.x[0], self.x[-1]
 
 
 class SpectrumCount(SpectrumBase):
@@ -265,29 +265,6 @@ class PoissonSpectrumCountFactory:
             y = y+y_
 
         y_error = np.sqrt(y)
-
-        return SpectrumCount(x, y, y_error)
-
-    @staticmethod
-    def build_spectrum_with_errors(*files: Iterable[str]) -> SpectrumCount:
-        """This factory method returns the particle distribution
-        corresponding to the given files.
-
-        Args:
-            files (Tupe[str]): paths to spectrum files
-        Returns:
-            SpectrumCount: The resulting Poisson spectrum count.
-        """
-        x, y, y_err_ = x_y_z(files[0])
-
-        y_err_squared = y_err_**2
-
-        for i in range(1, len(files)):
-            _, y_, y_err_ = x_y_z(files[i])
-            y += y_
-            y_err_squared += y_err_**2
-
-        y_error = np.sqrt(y_err_squared)
 
         return SpectrumCount(x, y, y_error)
 
@@ -563,3 +540,19 @@ def generate_source_spectrum_count_file(num_of_photons: float, bins=2000) -> str
     """
 
     return SourceSpectrumCountFileGenerator(AGN_SOURCE_DATA_STORAGE_PREFIX).generate(num_of_photons, bins=bins)
+
+
+def parse_spectral_data_files(*files):
+
+    x, y, y_err_ = x_y_z(files[0])
+
+    y_err_squared = y_err_**2
+
+    for i in range(1, len(files)):
+        _, y_, y_err_ = x_y_z(files[i])
+        y += y_
+        y_err_squared += y_err_**2
+
+    y_error = np.sqrt(y_err_squared)
+
+    return x, y, y_error

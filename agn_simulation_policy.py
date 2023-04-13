@@ -77,6 +77,8 @@ _AGN_SIMULATION_INFO_FILE_N_CLOUDS_KEY = "Number of Clouds"
 _AGN_SIMULATION_INFO_FILE_R_CLOUDS_KEY = "Radius of the clouds"
 _AGN_SIMULATION_INFO_FILE_ELECTRONS_TEMPERATURE_KEY = "Temperature of Electrons"
 
+HV_FEKALPHA: Final[float] = 6404.7
+
 
 def get_info_file_path(sim_root: str) -> str:
     for possible_info_file_name in _AGN_SIMULATION_INFO_FILE_POSSIBLE_NAMES:
