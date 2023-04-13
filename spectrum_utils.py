@@ -486,7 +486,8 @@ def print_spectra(output_dir: str, spectra: Dict[str, SpectrumCount]):
         with open(path_to_spectrum_file, mode='w') as file:
 
             for spectrum in spectra[spectrum_key]:
-                file.write(f'{spectrum.x:0.1f}  {spectrum.y:0.1f}\n')
+                file.write(
+                    f'{spectrum.x:0.1f} {spectrum.y:0.1f} {spectrum.y_err}\n')
 
     print('done!')
 

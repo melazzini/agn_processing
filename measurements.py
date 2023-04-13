@@ -68,7 +68,8 @@ class SpectralDataFileInfo:
     path_to_file: str
 
     def __str__(self):
-        return f'{self.nh_aver}_{self.n_aver}_{self.a_fe}_{self.alpha}_{self.grid_id}_{self.grid_metadata}_{self.type_label}.{self.file_data_type}'
+        return f'{self.nh_aver}_{self.n_aver}_{self.a_fe}_{self.alpha}_{self.grid_id}'
+        # return f'{self.nh_aver}_{self.n_aver}_{self.a_fe}_{self.alpha}_{self.grid_id}_{self.grid_metadata}_{self.type_label}.{self.file_data_type}'
 
     def build_spectral_data_info(path_to_file: str):
 
@@ -112,4 +113,4 @@ for root_dir in ["/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build
             spectral_info = SpectralDataFileInfo.build_spectral_data_info(
                 path_to_file=spectral_data_filepath)
 
-            print(spectral_info)
+            print(spectral_info.file_data_type)
