@@ -125,70 +125,70 @@ class SpectrumBase:
     # def algebraic_area_err(self):
     #     return np.sqrt(np.trapz(x=self.x, y=self.y_err**2))
 
-    # def get_cpy_on_interval(self, energy_interval: EnergyInterval):
-    #     """Returns the portion of the spectrum on the given interval
+    def get_cpy_on_interval(self, energy_interval: EnergyInterval):
+        """Returns the portion of the spectrum on the given interval
 
-    #     Args:
-    #         left (float): left value of the interval
-    #         right (float): right value of the interval
+        Args:
+            left (float): left value of the interval
+            right (float): right value of the interval
 
-    #     Returns:
-    #         SpectrumBase: portion of the spectrum on [left, right]
-    #     """
-    #     cpy = self._get_cpy_on_interval(
-    #         energy_interval.left, energy_interval.right, None)
+        Returns:
+            SpectrumBase: portion of the spectrum on [left, right]
+        """
+        cpy = self._get_cpy_on_interval(
+            energy_interval.left, energy_interval.right, None)
 
-    #     return type(self)(x=cpy.x, y=cpy.y, y_err=cpy.y_err)
+        return type(self)(x=cpy.x, y=cpy.y, y_err=cpy.y_err)
 
-    # def _get_cpy_on_interval(self, left: float, right: float = None, hole: bool = None):
-    #     """
-    #     This function returns the spectrum on the given interval.
+    def _get_cpy_on_interval(self, left: float, right: float = None, hole: bool = None):
+        """
+        This function returns the spectrum on the given interval.
 
-    #     If the right parameter is not passed and hole=True, then the right
-    #     energy bound will be so that the height at that point
-    #     is not greater than the height at the first point, else
-    #     the resulting spectrum will contain all the right points
-    #     starting at the left point.
-    #     """
+        If the right parameter is not passed and hole=True, then the right
+        energy bound will be so that the height at that point
+        is not greater than the height at the first point, else
+        the resulting spectrum will contain all the right points
+        starting at the left point.
+        """
 
-    #     x, y, y_err = self.x, self.y, self.y_err
+        x, y, y_err = self.x, self.y, self.y_err
 
-    #     new_x = []
-    #     new_y = []
-    #     new_y_err = []
-    #     zipped = zip(x, y, y_err)
-    #     if right != None:
-    #         for x_i, y_i, y_err in zipped:
-    #             if(left <= x_i <= right):
-    #                 new_x += [x_i]
-    #                 new_y += [y_i]
-    #                 new_y_err += [y_err]
-    #     elif hole:
-    #         max_height = 0
-    #         for x_i, y_i, y_err in zipped:
-    #             if left <= x_i:
-    #                 if(max_height > 0 and y_i >= max_height):
-    #                     break
-    #                 new_x += [x_i]
-    #                 new_y += [y_i]
-    #                 new_y_err += [y_err]
-    #                 if(max_height <= 0):
-    #                     max_height = new_y[0]
+        new_x = []
+        new_y = []
+        new_y_err = []
+        zipped = zip(x, y, y_err)
+        if right != None:
+            for x_i, y_i, y_err in zipped:
+                if(left <= x_i <= right):
+                    new_x += [x_i]
+                    new_y += [y_i]
+                    new_y_err += [y_err]
+        elif hole:
+            max_height = 0
+            for x_i, y_i, y_err in zipped:
+                if left <= x_i:
+                    if(max_height > 0 and y_i >= max_height):
+                        break
+                    new_x += [x_i]
+                    new_y += [y_i]
+                    new_y_err += [y_err]
+                    if(max_height <= 0):
+                        max_height = new_y[0]
 
-    #     elif hole == False:
-    #         max_height = 0
-    #         for x_i, y_i, y_err in zipped:
-    #             if left <= x_i:
-    #                 if(max_height > 0 and y_i <= max_height):
-    #                     break
-    #                 new_x += [x_i]
-    #                 new_y += [y_i]
-    #                 new_y_err += [y_err]
+        elif hole == False:
+            max_height = 0
+            for x_i, y_i, y_err in zipped:
+                if left <= x_i:
+                    if(max_height > 0 and y_i <= max_height):
+                        break
+                    new_x += [x_i]
+                    new_y += [y_i]
+                    new_y_err += [y_err]
 
-    #                 if(max_height <= 0):
-    #                     max_height = new_y[0]
+                    if(max_height <= 0):
+                        max_height = new_y[0]
 
-    #     return SpectrumBase(np.array(new_x), np.array(new_y), np.array(new_y_err))
+        return SpectrumBase(np.array(new_x), np.array(new_y), np.array(new_y_err))
 
     # def average_y(self, energy_interval: EnergyInterval) -> float:
     #     subspectrum = self.get_cpy_on_interval(energy_interval)
@@ -265,6 +265,29 @@ class PoissonSpectrumCountFactory:
             y = y+y_
 
         y_error = np.sqrt(y)
+
+        return SpectrumCount(x, y, y_error)
+
+    @staticmethod
+    def build_spectrum_with_errors(*files: Iterable[str]) -> SpectrumCount:
+        """This factory method returns the particle distribution
+        corresponding to the given files.
+
+        Args:
+            files (Tupe[str]): paths to spectrum files
+        Returns:
+            SpectrumCount: The resulting Poisson spectrum count.
+        """
+        x, y, y_err_ = x_y_z(files[0])
+
+        y_err_squared = y_err_**2
+
+        for i in range(1, len(files)):
+            _, y_, y_err_ = x_y_z(files[i])
+            y += y_
+            y_err_squared += y_err_**2
+
+        y_error = np.sqrt(y_err_squared)
 
         return SpectrumCount(x, y, y_error)
 
