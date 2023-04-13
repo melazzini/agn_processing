@@ -388,4 +388,4 @@ def perform_measurements(considered_nh_indexes: List[int], output_filepath: str,
                 continue
 
             measurements_file.write(
-                f'{fekalpha_line_key}   {ew.value}:{ew.err}   {h.value}:{h.err}    {compton_shoulder.value}:{compton_shoulder.err}    {edge.value}:{edge.err}:{chi2_}:{dof}\n')
+                f'{fekalpha_line_key}#{ew.value}:{ew.err}   {h.value}:{h.err}    {compton_shoulder.value}:{compton_shoulder.err}    {edge.value}:{edge.err}:{chi2_}:{dof}\n')

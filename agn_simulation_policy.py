@@ -43,6 +43,19 @@ AGN_IRON_ABUNDANCE: Final[Dict[str, float]] = {
     "2xfe": 2,
 }
 
+AGN_NH_AVERAGE: Final[Dict[str:float]] = {
+    "22": 1e22,
+    "222": 2e22,
+    "522": 5e22,
+    "822": 8e22,
+    "23": 1e23,
+    "223": 2e23,
+    "323": 3e23,
+    "523": 5e23,
+    "24": 1e24,
+    "224": 2e24,
+}
+
 
 AGN_SIMULATION_UNITS: Final[Dict[str, str]] = {
     LENGTH: 'meters',
