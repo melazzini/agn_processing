@@ -2,7 +2,6 @@ from colum_density_utils import ValueAndError, ColumnDensityGrid
 from agn_processing_policy import *
 import matplotlib.pyplot as plt
 from typing import Dict, List
-from agn_simulation_policy import AGN_NH_AVERAGE
 from measurable_utils import get_ew_vs_n_aver
 
 
