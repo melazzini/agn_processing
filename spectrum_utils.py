@@ -119,102 +119,102 @@ class SpectrumBase:
     #     """
     #     return self.x, self.y, self.y_err
 
-    # def algebraic_area(self):
-    #     return np.trapz(x=self.x, y=self.y)
+    def algebraic_area(self):
+        return np.trapz(x=self.x, y=self.y)
 
     # def algebraic_area_err(self):
     #     return np.sqrt(np.trapz(x=self.x, y=self.y_err**2))
 
-    # def get_cpy_on_interval(self, energy_interval: EnergyInterval):
-    #     """Returns the portion of the spectrum on the given interval
+    def get_cpy_on_interval(self, energy_interval: EnergyInterval):
+        """Returns the portion of the spectrum on the given interval
 
-    #     Args:
-    #         left (float): left value of the interval
-    #         right (float): right value of the interval
+        Args:
+            left (float): left value of the interval
+            right (float): right value of the interval
 
-    #     Returns:
-    #         SpectrumBase: portion of the spectrum on [left, right]
-    #     """
-    #     cpy = self._get_cpy_on_interval(
-    #         energy_interval.left, energy_interval.right, None)
+        Returns:
+            SpectrumBase: portion of the spectrum on [left, right]
+        """
+        cpy = self._get_cpy_on_interval(
+            energy_interval.left, energy_interval.right, None)
 
-    #     return type(self)(x=cpy.x, y=cpy.y, y_err=cpy.y_err)
+        return type(self)(x=cpy.x, y=cpy.y, y_err=cpy.y_err)
 
-    # def _get_cpy_on_interval(self, left: float, right: float = None, hole: bool = None):
-    #     """
-    #     This function returns the spectrum on the given interval.
+    def _get_cpy_on_interval(self, left: float, right: float = None, hole: bool = None):
+        """
+        This function returns the spectrum on the given interval.
 
-    #     If the right parameter is not passed and hole=True, then the right
-    #     energy bound will be so that the height at that point
-    #     is not greater than the height at the first point, else
-    #     the resulting spectrum will contain all the right points
-    #     starting at the left point.
-    #     """
+        If the right parameter is not passed and hole=True, then the right
+        energy bound will be so that the height at that point
+        is not greater than the height at the first point, else
+        the resulting spectrum will contain all the right points
+        starting at the left point.
+        """
 
-    #     x, y, y_err = self.x, self.y, self.y_err
+        x, y, y_err = self.x, self.y, self.y_err
 
-    #     new_x = []
-    #     new_y = []
-    #     new_y_err = []
-    #     zipped = zip(x, y, y_err)
-    #     if right != None:
-    #         for x_i, y_i, y_err in zipped:
-    #             if(left <= x_i <= right):
-    #                 new_x += [x_i]
-    #                 new_y += [y_i]
-    #                 new_y_err += [y_err]
-    #     elif hole:
-    #         max_height = 0
-    #         for x_i, y_i, y_err in zipped:
-    #             if left <= x_i:
-    #                 if(max_height > 0 and y_i >= max_height):
-    #                     break
-    #                 new_x += [x_i]
-    #                 new_y += [y_i]
-    #                 new_y_err += [y_err]
-    #                 if(max_height <= 0):
-    #                     max_height = new_y[0]
+        new_x = []
+        new_y = []
+        new_y_err = []
+        zipped = zip(x, y, y_err)
+        if right != None:
+            for x_i, y_i, y_err in zipped:
+                if(left <= x_i <= right):
+                    new_x += [x_i]
+                    new_y += [y_i]
+                    new_y_err += [y_err]
+        elif hole:
+            max_height = 0
+            for x_i, y_i, y_err in zipped:
+                if left <= x_i:
+                    if(max_height > 0 and y_i >= max_height):
+                        break
+                    new_x += [x_i]
+                    new_y += [y_i]
+                    new_y_err += [y_err]
+                    if(max_height <= 0):
+                        max_height = new_y[0]
 
-    #     elif hole == False:
-    #         max_height = 0
-    #         for x_i, y_i, y_err in zipped:
-    #             if left <= x_i:
-    #                 if(max_height > 0 and y_i <= max_height):
-    #                     break
-    #                 new_x += [x_i]
-    #                 new_y += [y_i]
-    #                 new_y_err += [y_err]
+        elif hole == False:
+            max_height = 0
+            for x_i, y_i, y_err in zipped:
+                if left <= x_i:
+                    if(max_height > 0 and y_i <= max_height):
+                        break
+                    new_x += [x_i]
+                    new_y += [y_i]
+                    new_y_err += [y_err]
 
-    #                 if(max_height <= 0):
-    #                     max_height = new_y[0]
+                    if(max_height <= 0):
+                        max_height = new_y[0]
 
-    #     return SpectrumBase(np.array(new_x), np.array(new_y), np.array(new_y_err))
+        return SpectrumBase(np.array(new_x), np.array(new_y), np.array(new_y_err))
 
-    # def average_y(self, energy_interval: EnergyInterval) -> float:
-    #     subspectrum = self.get_cpy_on_interval(energy_interval)
-    #     return np.sum(subspectrum.y)/len(subspectrum.y)
+    def average_y(self, energy_interval: EnergyInterval) -> float:
+        subspectrum = self.get_cpy_on_interval(energy_interval)
+        return np.sum(subspectrum.y)/len(subspectrum.y)
 
-    # def average(self, energy_interval: EnergyInterval = None) -> Tuple[ValueAndError, float]:
+    def average(self, energy_interval: EnergyInterval = None) -> ValueAndError:
 
-    #     if energy_interval == None:
-    #         energy_interval = EnergyInterval(self.x[0], self.x[-1])
+        if energy_interval == None:
+            energy_interval = EnergyInterval(self.x[0], self.x[-1])
 
-    #     subspectrum = self.get_cpy_on_interval(energy_interval)
+        subspectrum = self.get_cpy_on_interval(energy_interval)
 
-    #     aver_x = np.sum(subspectrum.x)/len(subspectrum.x)
-    #     index = get_interval_index_log(aver_x, Interval2D(
-    #         energy_interval.left, energy_interval.right), len(subspectrum.x))
-    #     aver_y = np.sum(subspectrum.y)/len(subspectrum.y)
-    #     aver_y_err = np.sqrt(np.sum(subspectrum.y_err**2)) / \
-    #         len(subspectrum.y_err)
+        aver_x = np.sum(subspectrum.x)/len(subspectrum.x)
+        index = get_interval_index_log(aver_x, Interval2D(
+            energy_interval.left, energy_interval.right), len(subspectrum.x))
+        aver_y = np.sum(subspectrum.y)/len(subspectrum.y)
+        aver_y_err = np.sqrt(np.sum(subspectrum.y_err**2)) / \
+            len(subspectrum.y_err)
 
-    #     return ValueAndError(value=aver_y, err=aver_y_err), subspectrum.x[index]
+        return ValueAndError(value=aver_y, err=aver_y_err)
 
     # def std_y(self, energy_interval: EnergyInterval) -> float:
     #     return np.std(self.get_cpy_on_interval(energy_interval).y)
 
-    # def x_interval(self):
-    #     return self.x[0], self.x[-1]
+    def x_interval(self):
+        return self.x[0], self.x[-1]
 
 
 class SpectrumCount(SpectrumBase):
@@ -486,7 +486,8 @@ def print_spectra(output_dir: str, spectra: Dict[str, SpectrumCount]):
         with open(path_to_spectrum_file, mode='w') as file:
 
             for spectrum in spectra[spectrum_key]:
-                file.write(f'{spectrum.x:0.1f}  {spectrum.y:0.1f}\n')
+                file.write(
+                    f'{spectrum.x:0.1f} {spectrum.y:0.1f} {spectrum.y_err}\n')
 
     print('done!')
 
@@ -539,3 +540,19 @@ def generate_source_spectrum_count_file(num_of_photons: float, bins=2000) -> str
     """
 
     return SourceSpectrumCountFileGenerator(AGN_SOURCE_DATA_STORAGE_PREFIX).generate(num_of_photons, bins=bins)
+
+
+def parse_spectral_data_files(*files):
+
+    x, y, y_err_ = x_y_z(files[0])
+
+    y_err_squared = y_err_**2
+
+    for i in range(1, len(files)):
+        _, y_, y_err_ = x_y_z(files[i])
+        y += y_
+        y_err_squared += y_err_**2
+
+    y_error = np.sqrt(y_err_squared)
+
+    return x, y, y_error

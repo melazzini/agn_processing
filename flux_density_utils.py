@@ -91,17 +91,17 @@ class FluxDensity(SpectrumBase):
 
         super().__init__(x, y, y_err)
 
-    # def _flux_std(self, base: int = 10):
-    #     energy_interval = EnergyInterval(*self.x_interval())
+    def _flux_std(self):
+        energy_interval = EnergyInterval(*self.x_interval())
 
-    #     energy_widths = build_energy_widths(
-    #         energy_interval=energy_interval, num_of_intervals=len(self.x), base=base)
+        energy_widths = build_log10_energy_widths(
+            energy_interval=energy_interval, n_intervals=len(self.x))
 
-    #     return np.sqrt(np.sum((self.y_err*energy_widths)**2))
+        return np.sqrt(np.sum((self.y_err*energy_widths)**2))
 
-    # def flux(self, base_of_log_energy_interval: int = 10):
-    #     return ValueAndError(value=self.algebraic_area(),
-    #                          err=self._flux_std(base=base_of_log_energy_interval))
+    def flux(self):
+        return ValueAndError(value=self.algebraic_area(),
+                             err=self._flux_std())
 
 
 class FluxDensityBuilder:
@@ -112,7 +112,7 @@ class FluxDensityBuilder:
                                         angle_interval: AngularInterval,
                                         nh: float,
                                         nh_distribution: ColumnDensityDistribution,
-                                        norm_params: NormalizationFluxDensityParameters = NORMALIZATION_SIMULATION_PARAMS)->FluxDensity:
+                                        norm_params: NormalizationFluxDensityParameters = NORMALIZATION_SIMULATION_PARAMS) -> FluxDensity:
         """Builds the flux density.
 
                 DONT USE THIS METHOD TO CREATE THE NORMALIZATION FLUX DENSITY!

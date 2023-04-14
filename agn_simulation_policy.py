@@ -43,6 +43,19 @@ AGN_IRON_ABUNDANCE: Final[Dict[str, float]] = {
     "2xfe": 2,
 }
 
+AGN_NH_AVERAGE: Final[Dict[str:float]] = {
+    "22": 1e22,
+    "222": 2e22,
+    "522": 5e22,
+    "822": 8e22,
+    "23": 1e23,
+    "223": 2e23,
+    "323": 3e23,
+    "523": 5e23,
+    "24": 1e24,
+    "224": 2e24,
+}
+
 
 AGN_SIMULATION_UNITS: Final[Dict[str, str]] = {
     LENGTH: 'meters',
@@ -76,6 +89,8 @@ _AGN_SIMULATION_INFO_FILE_N_PHOTONS_KEY = "Number of Photons"
 _AGN_SIMULATION_INFO_FILE_N_CLOUDS_KEY = "Number of Clouds"
 _AGN_SIMULATION_INFO_FILE_R_CLOUDS_KEY = "Radius of the clouds"
 _AGN_SIMULATION_INFO_FILE_ELECTRONS_TEMPERATURE_KEY = "Temperature of Electrons"
+
+HV_FEKALPHA: Final[float] = 6404.7
 
 
 def get_info_file_path(sim_root: str) -> str:

@@ -290,3 +290,12 @@ def get_direction_filepaths(simulations: List[AgnSimulationInfo], alpha: Angular
                 direction_files += [x[viewing_angle_key]]
 
     return direction_files
+
+
+def compton_shift(energy: float) -> float:
+    """
+    E=E0*(1-2E0/mc^2)
+    """
+    mc2 = 511_000
+    return energy*(1 - (2*energy)/mc2)
+
