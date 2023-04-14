@@ -59,3 +59,24 @@ def get_shoulder_vs_nhaver(measurements_filepath: str) -> Dict[str, List[ValueAn
             data[key.nh_aver] += [value.shoulder]
 
     return data
+
+
+
+def get_ew_vs_n_aver(measurements_filepath: str, nh_index: int, a_fe: str):
+
+    data: Dict[int, List[ValueAndError]] = {}
+
+    with open(measurements_filepath) as measurements_file:
+        for line in measurements_file:
+            key, value = parse_measurement(measurement_line=line)
+
+            if key.nh_index != nh_index or key.a_fe != a_fe:
+                continue
+
+            if key.n_aver not in data:
+                data[key.n_aver] = []
+
+            data[key.n_aver] += [value.ew]
+            print(f'the data: {data}')
+
+    return data

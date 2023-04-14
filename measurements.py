@@ -400,7 +400,7 @@ class MeasurementsKey:
     label: str
     nh_aver: str
     n_aver: int
-    a_fe: float
+    a_fe: str
     alpha: AngularInterval
     nh_index: int
 
@@ -416,7 +416,7 @@ class MeasurementsKey:
             sep='_')
         nh_aver = nh_aver_code
         n_aver = int(n_aver_code)
-        a_fe = AGN_IRON_ABUNDANCE[a_fe_code]
+        a_fe = a_fe_code
         alpha = AGN_VIEWING_DIRECTIONS_DEG[alpha_code]
         nh_index = int(nh_index_code)
         return MeasurementsKey(label=label,
