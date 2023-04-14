@@ -1,15 +1,12 @@
 from os import listdir, path, mkdir, path
 from agn_utils import AgnSimulationInfo, AGN_EFFECTIVE_LENGTHS_DIR_LABEL, AGN_VIEWING_DIRECTIONS_DEG, get_effective_lengths_directions_filename
 import subprocess
-from paths_in_this_machine import root_simulations_directory, create_nh_distribution
-from functools import reduce
+from paths_in_this_machine import create_nh_distribution, root_dirs
+from agn_processing_policy import TOTAL_DIRECTIONS
 
-TOTAL_DIRECTIONS = 1_000_000
 
-root_dir = root_simulations_directory
 
-# for root_dir in ["/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_223", "/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_23", "/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_523"]:
-for root_dir in ["/home/francisco/Projects/agn/agn/AGNClumpySpecialization/build/results/N_H_223"]:
+for root_dir in root_dirs:
     print('=====================================')
     for sim_dir in listdir(root_dir):
         sim_root_dir = path.join(root_dir, sim_dir)
