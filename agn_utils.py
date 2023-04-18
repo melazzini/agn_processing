@@ -298,4 +298,3 @@ def compton_shift(energy: float) -> float:
     """
     mc2 = 511_000
     return energy*(1 - (2*energy)/mc2)
-

@@ -34,12 +34,22 @@ def simulations_root_dir(nh_aver: float) -> str:
         str: the path to the simulations root directory
     """
 
-    if nh_aver == 1e23:
+    if nh_aver == 1e22:
+        return os.path.join(repo_directory, 'N_H_22')
+    elif nh_aver == 2e22:
+        return os.path.join(repo_directory, 'N_H_222')
+    elif nh_aver == 5e22:
+        return os.path.join(repo_directory, 'N_H_522')
+    elif nh_aver == 8e22:
+        return os.path.join(repo_directory, 'N_H_822')
+    elif nh_aver == 1e23:
         return os.path.join(repo_directory, 'N_H_23')
     elif nh_aver == 2e23:
         return os.path.join(repo_directory, 'N_H_223')
     elif nh_aver == 5e23:
         return os.path.join(repo_directory, 'N_H_523')
+    elif nh_aver == 1e24:
+        return os.path.join(repo_directory, 'N_H_24')
     else:
         raise ValueError(
             f'The simulation directory for nh={nh_aver} cannot be determined!')

@@ -123,7 +123,7 @@ class AbsorptionEdgeFitter:
             left_count = (m*left_spectrum.x) + b
             right_count = N_fit * ((m*right_spectrum.x) + b)
 
-            return np.concatenate((left_count, center_zero_spectrum.y, right_count))
+            return np.concatenate((left_count, center_zero_spectrum.y, right_count))        
 
         return fitter
 

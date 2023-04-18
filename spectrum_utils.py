@@ -485,9 +485,10 @@ def print_spectra(output_dir: str, spectra: Dict[str, SpectrumCount]):
 
         with open(path_to_spectrum_file, mode='w') as file:
 
-            for spectrum in spectra[spectrum_key]:
+            for x, y, y_err in zip(spectra[spectrum_key].x, spectra[spectrum_key].y, spectra[spectrum_key].y_err):
+
                 file.write(
-                    f'{spectrum.x:0.1f} {spectrum.y:0.1f} {spectrum.y_err}\n')
+                    f'{x} {y} {y_err}\n')
 
     print('done!')
 

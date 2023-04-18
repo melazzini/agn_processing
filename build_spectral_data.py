@@ -9,9 +9,9 @@ from dataclasses import dataclass
 from spectrum_utils import PoissonSpectrumCountFactory, generate_source_spectrum_count_file, print_spectra
 from flux_density_utils import FluxDensityBuilder, FULL_TORUS_ANGLE_DEG
 
-for nh_aver in [2e23]:
+for nh_aver in [1e22, 2e22, 5e22, 8e22, 1e23, 2e23, 5e23, 1e24]:
     for n_aver in [-1, 2, 3, 4, 5, 8]:
-        for a_fe in [0.5, 1, 2]:
+        for a_fe in [0.5, 0.7, 1, 1.5, 2]:
             for alpha in [AngularInterval(60, 15), AngularInterval(75, 15)]:
                 sims_root_dir = simulations_root_dir(nh_aver=nh_aver)
 

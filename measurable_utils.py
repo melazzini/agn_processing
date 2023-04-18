@@ -4,7 +4,7 @@ from typing import Tuple, Dict, List
 import numpy as np
 
 
-def get_edge_vs_h(measurements_filepath: str, nh_index: int) -> Tuple[np.ndarray]:
+def get_edge_vs_h(measurements_filepath: str, nh_index: int, a_fe: str = None) -> Tuple[np.ndarray]:
     """Returns the edge vs h data to be plotted.
 
     For example:
@@ -37,11 +37,26 @@ def get_edge_vs_h(measurements_filepath: str, nh_index: int) -> Tuple[np.ndarray
         for line in measurements_file:
             key, value = parse_measurement(measurement_line=line)
 
-            if key.nh_index == nh_index:
-                h += [value.h.value]
-                h_err += [value.h.err]
-                edge += [value.edge.value]
-                edge_err += [value.edge.err]
+            if a_fe != None:
+                if key.nh_index == nh_index and key.a_fe == a_fe:
+
+                    if value.edge.err/(1-value.edge.value) > 0.1:
+                        continue
+
+                    if 0.80865 <= 1-value.edge.value <= 0.8087:
+                        print(key)
+
+                    h += [value.h.value]
+                    h_err += [value.h.err]
+                    edge += [value.edge.value]
+                    edge_err += [value.edge.err]
+            else:
+                if key.nh_index == nh_index:
+
+                    h += [value.h.value]
+                    h_err += [value.h.err]
+                    edge += [value.edge.value]
+                    edge_err += [value.edge.err]
 
     return np.array(h), np.array(h_err), np.array(edge), np.array(edge_err)
 
@@ -59,7 +74,6 @@ def get_shoulder_vs_nhaver(measurements_filepath: str) -> Dict[str, List[ValueAn
             data[key.nh_aver] += [value.shoulder]
 
     return data
-
 
 
 def get_ew_vs_n_aver(measurements_filepath: str, nh_index: int, a_fe: str):
