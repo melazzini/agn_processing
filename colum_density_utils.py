@@ -211,3 +211,12 @@ class ColumnDensityDistribution:
 
     def get_distribution_value_err_for_nh(self, nh: float) -> float:
         return self._histogram.counts_err[self.grid.index(nh=nh)]
+
+    def get_mean(self):
+        return self._histogram.mean()
+
+    def get_std(self):
+        return self._histogram.std()
+
+    def get_max(self):
+        return max(self._histogram.counts)

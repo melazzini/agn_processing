@@ -45,7 +45,7 @@ for n_h in [5e22, 1e23, 2e23, 5e23, 1e24]:
     for a_fe in ['05xfe', '1xfe', '2xfe']:
         h, h_err, edge, edge_err = get_edge_vs_h(
             os.path.join(
-                repo_directory, f"{g.n_intervals}_{g.left:0.2g}_{g.right:0.2g}.measurements"),
+                repo_directory, f"{g.n_intervals}_{g.left:0.2g}_{g.right:0.2g}_{HV_N_INTERVALS}.measurements"),
             nh_index=g.index(nh=n_h), a_fe=a_fe)
         if len(h) == 0:
             continue
