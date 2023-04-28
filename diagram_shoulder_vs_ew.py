@@ -5,7 +5,7 @@ from matplotlib.lines import Line2D
 from typing import Dict, List, Tuple, Final
 from agn_simulation_policy import AGN_NH_AVERAGE
 from measurable_utils import parse_measurement, get_shoulder_vs_nhaver
-from measurements import MeasurementsKey, MeasurementsValue, AngularInterval
+from measurements import MeasurementKey, MeasurementValue, AngularInterval
 from paths_in_this_machine import repo_directory
 import os
 from matplotlib.pyplot import figure
@@ -48,8 +48,8 @@ g = ColumnDensityGrid(left_nh=LEFT_NH, right_nh=RIGHT_NH,
                       n_intervals=NH_INTERVALS)
 
 
-def get_shoulder_vs_ew(measurements_filepath: str, nh_id: int, a_fe: str) -> Dict[MeasurementsKey, Tuple[ValueAndError, ValueAndError]]:
-    data: Dict[MeasurementsKey, Tuple[ValueAndError, ValueAndError]] = {}
+def get_shoulder_vs_ew(measurements_filepath: str, nh_id: int, a_fe: str) -> Dict[MeasurementKey, Tuple[ValueAndError, ValueAndError]]:
+    data: Dict[MeasurementKey, Tuple[ValueAndError, ValueAndError]] = {}
 
     with open(measurements_filepath) as measurements_file:
         for line in measurements_file:
@@ -63,7 +63,7 @@ def get_shoulder_vs_ew(measurements_filepath: str, nh_id: int, a_fe: str) -> Dic
     return data
 
 
-data: Dict[MeasurementsKey, Tuple[ValueAndError, ValueAndError]] = get_shoulder_vs_ew(
+data: Dict[MeasurementKey, Tuple[ValueAndError, ValueAndError]] = get_shoulder_vs_ew(
     os.path.join(repo_directory, f"{g.n_intervals}_{g.left:0.2g}_{g.right:0.2g}_{HV_N_INTERVALS}.measurements"), nh_id=g.index(1e24), a_fe='1xfe')
 
 colors_used = []

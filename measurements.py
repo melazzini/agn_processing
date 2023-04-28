@@ -123,7 +123,7 @@ class AbsorptionEdgeFitter:
             left_count = (m*left_spectrum.x) + b
             right_count = N_fit * ((m*right_spectrum.x) + b)
 
-            return np.concatenate((left_count, center_zero_spectrum.y, right_count))        
+            return np.concatenate((left_count, center_zero_spectrum.y, right_count))
 
         return fitter
 
@@ -393,7 +393,7 @@ def perform_measurements(considered_nh_indexes: List[int], output_filepath: str,
 
 
 @dataclass
-class MeasurementsKey:
+class MeasurementKey:
     """For example: MeasurementsKey.build_key('523_5_1xfe_7590_27')
     """
 
@@ -419,16 +419,16 @@ class MeasurementsKey:
         a_fe = a_fe_code
         alpha = AGN_VIEWING_DIRECTIONS_DEG[alpha_code]
         nh_index = int(nh_index_code)
-        return MeasurementsKey(label=label,
-                               nh_aver=nh_aver,
-                               n_aver=n_aver,
-                               a_fe=a_fe,
-                               alpha=alpha,
-                               nh_index=nh_index)
+        return MeasurementKey(label=label,
+                              nh_aver=nh_aver,
+                              n_aver=n_aver,
+                              a_fe=a_fe,
+                              alpha=alpha,
+                              nh_index=nh_index)
 
 
 @dataclass
-class MeasurementsValue:
+class MeasurementValue:
     """
     For example:
 
@@ -471,12 +471,18 @@ class MeasurementsValue:
         edge_chi2_value = float(edge_chi2_code)
         edge_chi2_dof = int(edge_chi2_dof_code)
 
-        return MeasurementsValue(ew=ew, h=h, shoulder=shoulder, edge=edge, edge_chi2_value=edge_chi2_value, edge_chi2_dof=edge_chi2_dof)
+        return MeasurementValue(ew=ew, h=h, shoulder=shoulder, edge=edge, edge_chi2_value=edge_chi2_value, edge_chi2_dof=edge_chi2_dof)
 
 
-def parse_measurement(measurement_line: str) -> Tuple[MeasurementsKey, MeasurementsValue]:
+@dataclass
+class Measurement:
+    key: MeasurementKey
+    value: MeasurementValue
+
+
+def parse_measurement(measurement_line: str) -> Tuple[MeasurementKey, MeasurementValue]:
     key_code, value_code = measurement_line.split(sep='#')
-    key = MeasurementsKey.build_key(label=key_code)
-    value = MeasurementsValue.build_value(value_str=value_code)
+    key = MeasurementKey.build_key(label=key_code)
+    value = MeasurementValue.build_value(value_str=value_code)
 
     return key, value

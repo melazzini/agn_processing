@@ -1,96 +1,107 @@
-from measurable_utils import get_edge_vs_h
-from colum_density_utils import ColumnDensityGrid
+from measurable_utils import get_edge_vs_h_by_nh_aver, load_data_from_file, filter_data_by_nhaver, Measurement, filter_data_by_nh
+from colum_density_utils import ColumnDensityGrid, DEFAULT_NH_GRID
 from agn_processing_policy import *
-from agn_simulation_policy import AGN_IRON_ABUNDANCE
+from agn_simulation_policy import AGN_IRON_ABUNDANCE, AGN_NH_AVERAGE
 import matplotlib.pyplot as plt
 from typing import Dict, Tuple, List
 import numpy as np
-import os
 from paths_in_this_machine import *
-from matplotlib.pyplot import figure
+from matplotlib.lines import Line2D
 from scipy.optimize import curve_fit
+from agn_art_utils import *
+from matplotlib.pyplot import figure
 figure(figsize=(8, 7), dpi=120)
 
 
 def fit_h_N_fit_m1(h, a, b, c):
     return a + b*np.log10(h) + c*np.log10(h)**2
 
-def fit_h_N_fit_m2(h, a, b, c, d):
-    return a + b*h**1.2 + c*h**d
+
+used_nh_aver = '24'
+
+data = load_data_from_file(MEASUREMENTS_FILEPATH)
+data = filter_data_by_nhaver(data=data, nh_aver=used_nh_aver)
+
+permitted_indices = [DEFAULT_NH_GRID.index(
+    nh=nh) for nh in [2e23, 5e23, 1e24]]
+
+used_indices = set()
+
+for measurement in data:
+
+    if measurement.key.nh_index not in permitted_indices:
+        continue
+
+    if measurement.value.edge.err/(1-measurement.value.edge.value) > 0.2:
+        continue
+
+    used_indices.add(measurement.key.nh_index)
+
+    plt.scatter(measurement.value.h.value, 1 -
+                measurement.value.edge.value, [150],
+                edgecolor=ABUNDANCE_COLOR[measurement.key.a_fe],
+                color=NH_COLORS[measurement.key.nh_index],
+                linewidths=2,
+                marker=MARKERS[measurement.key.n_aver])
+
+    plt.errorbar(measurement.value.h.value, 1 -
+                 measurement.value.edge.value, measurement.value.edge.err,
+                 xerr=measurement.value.h.err,
+                 color='none',
+                 ecolor='black', linewidth=0.9)
 
 
-g = ColumnDensityGrid(LEFT_NH, RIGHT_NH, NH_INTERVALS)
+used_indices = sorted(used_indices)
+
+for index in used_indices:
+    data_by_index = filter_data_by_nh(data=data, nh_index=index)
+
+    x = []
+    y = []
+
+    for measurement in data_by_index:
+        x += [measurement.value.h.value]
+        y += [1-measurement.value.edge.value]
+
+    pars, _ = curve_fit(fit_h_N_fit_m1, x, y, maxfev=1_000_000)
+
+    x = np.linspace(min(x), max(x), num=100)
+    y = fit_h_N_fit_m1(x, *pars)
+    plt.plot(x, y, color=NH_COLORS[index])
+
 
 plt.grid()
 
-ABUNDANCE_COLOR = {
-    '05xfe': 'peru',
-    '1xfe': 'cyan',
-    '2xfe': 'blue',
-}
+# lines = [
+#     Line2D([0], [0], color=ABUNDANCE_COLOR[key]) for key in ABUNDANCE_COLOR
+# ]
 
-NH_COLORS = {
-    5e22: 'red',
-    1e23: 'gold',
-    2e23: 'brown',
-    5e23: 'g',
-    1e24: 'pink',
-}
+# labels = [
+#     r'$A_{Fe} = $' f'{AGN_IRON_ABUNDANCE[key]}' for key in AGN_IRON_ABUNDANCE
+# ]
 
-data_per_abundance = {}
-data_per_nh = {}
+# lines = [
+#     Line2D([0], [0], markeredgecolor='black', marker=MARKERS[n_i], markersize=10, color='none') for n_i in MARKERS if n_i != 1
+# ]
 
+# labels = [
+#     r'$<N> =$' f'{n_i if n_i!=NUM_OF_CLOUDS_SMOOTH else "smooth"}' for n_i in MARKERS if n_i != 1
+# ]
 
-for n_h in [5e22, 1e23, 2e23, 5e23, 1e24]:
-    for a_fe in ['05xfe', '1xfe', '2xfe']:
-        h, h_err, edge, edge_err = get_edge_vs_h(
-            os.path.join(
-                repo_directory, f"{g.n_intervals}_{g.left:0.2g}_{g.right:0.2g}_{HV_N_INTERVALS}.measurements"),
-            nh_index=g.index(nh=n_h), a_fe=a_fe)
-        if len(h) == 0:
-            continue
+lines = [
+    Line2D([0], [0], color=NH_COLORS[index]) for index in used_indices
+]
 
-        if a_fe not in data_per_abundance:
-            data_per_abundance[a_fe] = [list(), list()]
-
-        if n_h not in data_per_nh:
-            data_per_nh[n_h] = [list(), list()]
-
-        data_per_abundance[a_fe][0] += list(h)
-        data_per_abundance[a_fe][1] += list(1-edge)
-
-        data_per_nh[n_h][0] += list(h)
-        data_per_nh[n_h][1] += list(1-edge)
-
-        plt.scatter(
-            h, 1-edge, edgecolors=ABUNDANCE_COLOR[a_fe], c=NH_COLORS[n_h], label=r'$N_H=$' f'{n_h:0.2g}' r'$cm^{-2}$, $A_{Fe}=$' f'{AGN_IRON_ABUNDANCE[a_fe]:0.2g}')
-
-        plt.errorbar(h, 1-edge, edge_err, color='none',
-                     ecolor='black', xerr=h_err, elinewidth=0.9)
+labels = [
+    r'$N_H = $' f'{NH_LABELS[index]}' for index in used_indices
+]
 
 
-for a_fe in ['05xfe', '1xfe', '2xfe']:
-    xdata, ydata = data_per_abundance[a_fe]
-    pars, _ = curve_fit(fit_h_N_fit_m1, xdata=xdata, ydata=ydata)
-    x0, x1 = min(xdata), max(xdata)
-    x = np.linspace(x0, x1, 100)
-    plt.plot(x, fit_h_N_fit_m1(x, *pars),
-             color=ABUNDANCE_COLOR[a_fe], linestyle='dashed', linewidth=1)
-
-
-for n_h in [1e23, 2e23, 5e23, 1e24]:
-    xdata, ydata = data_per_nh[n_h]
-    pars, _ = curve_fit(fit_h_N_fit_m2, xdata=xdata, ydata=ydata, maxfev=1_000_000)
-    x0, x1 = min(xdata), max(xdata)
-    x = np.linspace(x0, x1, 100)
-    plt.plot(x, fit_h_N_fit_m2(x, *pars),
-             color=NH_COLORS[n_h], linestyle='dashed', linewidth=1)
-
-plt.legend()
+plt.legend(lines, labels)
 plt.xlabel('H')
 plt.ylabel(r'$1-N_{Fe}$')
-plt.xscale('log')
-# plt.yscale('log')
+plt.title(
+    r'$<N_H> =$' f'{NH_LABELS[DEFAULT_NH_GRID.index(AGN_NH_AVERAGE[used_nh_aver])]}')
 plt.subplots_adjust(
     top=0.95,
     bottom=0.07,

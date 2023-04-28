@@ -39,6 +39,7 @@ import pint
 from agn_simulation_policy import AGN_SIMULATION_UNITS, AGN_PROCESSING_UNITS
 from agn_processing_policy import LEFT_NH, NH_INTERVALS, RIGHT_NH
 from agn_utils import AgnSimulationInfo
+from typing import Final
 
 
 class ColumnDensityInterval(Interval2D):
@@ -121,6 +122,10 @@ class ColumnDensityGrid:
 
     def __str__(self):
         return f'{self.left:0.2g}:{self.right:0.2g}:{self.n_intervals}'
+
+
+DEFAULT_NH_GRID: Final[ColumnDensityGrid] = ColumnDensityGrid(
+    left_nh=LEFT_NH, right_nh=RIGHT_NH, n_intervals=NH_INTERVALS)
 
 
 def get_hydrogen_concentration(aver_column_density: float,
